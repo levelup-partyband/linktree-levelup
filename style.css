@@ -87,7 +87,7 @@ body {
 }
 
 .link:active {
-    background-color: var(--accentColor);
+    background-color: var(--accentColor)!important;
     color: var(--bgColor);
 }
 
