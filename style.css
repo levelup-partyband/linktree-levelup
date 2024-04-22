@@ -1,10 +1,20 @@
 @import url('https://fonts.googleapis.com/css?family=Karla:400,700&display=swap');
 
+// <uniquifier>: Use a unique and descriptive class name
+// <weight>: Use a value from 300 to 700
+
+.quicksand-<uniquifier> {
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+
 :root {
     --bgColor: #223344;
     --bgColor2: #090a0f;
     --accentColor: #FFF;
-    --font: 'Karla', sans-serif;
+    --font: 'Quicksand','Karla', sans-serif;
     --delay: .3s;
 }
 
