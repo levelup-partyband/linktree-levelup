@@ -28,7 +28,7 @@ body {
     width: 150px;
     height: 150px;
     display: block;
-    margin: 40px auto 20px;
+    margin: 20px auto;
     border-radius: 50%;
     -webkit-tap-highlight-color: transparent;
 }
