@@ -38,7 +38,6 @@ body {
     object-fit: cover;
     display: block;
     margin: 20px auto;
-    border-radius: 50%;
     -webkit-tap-highlight-color: transparent;
 }
 
