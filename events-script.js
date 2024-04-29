@@ -6,7 +6,7 @@ var arEventi = [
    { nome: 'Festa di Case di Coccia', data: '29/06/2024', luogo: 'Case di Coccia - Folignano (AP)', link: ''},
    { nome: 'Sagra della Tagliata', data: '18/07/2024', luogo: 'Piane di Morro - Folignano (AP)', link: ''},
 ];
-console.log('arEventi-5:',arEventi);
+console.log('arEventi:',new Date().toLocaleTimeString(),arEventi);
 
 // Funzione per popolare gli eventi nel documento HTML
 function popolaEventi() {
