@@ -30,7 +30,7 @@ function popolaEventi() {
                  <div style="flex: 7; text-align: center;">
                      <div class="event-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase;">${evento.nome}</div>
                      <div class="event-location" style="font-size: 16px;">${evento.luogo}</div>
-                     ${evento.link ? `<div class="event-link" style="font-size: 12px; cursor: pointer;" onclick="if('${evento.link}') window.location.href = '${evento.link}';">Ulteriori informazioni</div>` : ''}
+                     ${evento.indirizzo ? `<a href="${evento.indirizzoLink}" class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer;" target="_blank">${evento.indirizzo}</a>` : ''}
                  </div>
              </div>
             `;
