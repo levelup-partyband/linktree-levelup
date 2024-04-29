@@ -1,6 +1,24 @@
 // Dati degli eventi
 var arEventi = [
    {
+      nome: 'Festa di AAA',
+      data: '28/04/2024',
+      luogo: 'Case di Coccia - Folignano (AP)',
+      link: ''
+   },
+   {
+      nome: 'Festa di BBB',
+      data: '29/04/2024',
+      luogo: 'Case di Coccia - Folignano (AP)',
+      link: ''
+   },
+   {
+      nome: 'Festa di CCC',
+      data: '30/04/2024',
+      luogo: 'Case di Coccia - Folignano (AP)',
+      link: ''
+   },
+   {
       nome: 'Festa di Case di Coccia',
       data: '29/06/2024',
       luogo: 'Case di Coccia - Folignano (AP)',
