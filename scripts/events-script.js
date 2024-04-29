@@ -21,16 +21,16 @@ function popolaEventi() {
         if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
             // Costruisci direttamente il template CARD utilizzando la sintassi dei template string
             var cardHTML = `
-                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; align-items:center; background-color:#ffffff22; cursor: ${evento.link ? 'pointer' : 'default'}" onclick="apriLink('${evento.link}')">
-                    <div style="flex: 1; text-align: center; padding:0 5px;">
+                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; flex-direction: column; align-items:center; background-color:#ffffff22; cursor:pointer;" onclick="if('${evento.link}') window.location.href = '${evento.link}';">
+                    <div style="text-align: center;">
                         <div class="event-day" style="font-size: 20px;">${data.toLocaleString('default', { weekday: 'short' }).toUpperCase()}</div>
                         <div class="event-date" style="font-size: 34px; font-weight: bold;">${data.getDate()}</div>
                         <div class="event-month" style="font-size: 20px;">${data.toLocaleString('default', { month: 'short' }).toUpperCase()}</div>
                     </div>
-                    <div style="flex: 7; text-align: center;">
+                    <div style="text-align: center;">
                         <div class="event-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase;">${evento.nome}</div>
                         <div class="event-location" style="font-size: 16px;">${evento.luogo}</div>
-                        ${evento.indirizzo ? `<div class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer;" onclick="if('${evento.indirizzoLink}') window.location.href = '${evento.indirizzoLink}'; target:'_blank'">${evento.indirizzo}</div>` : ''}
+                        ${evento.indirizzo ? `<a href="${evento.indirizzoLink}" class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer;" target="_blank">${evento.indirizzo}</a>` : ''}
                     </div>
                 </div>
             `;
@@ -41,9 +41,3 @@ function popolaEventi() {
     });
 }
 
-// Funzione per aprire il link
-function apriLink(link) {
-    if (link.trim() !== '') {
-        window.open(link, '_blank');
-    }
-}
