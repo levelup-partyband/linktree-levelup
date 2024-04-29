@@ -21,18 +21,18 @@ function popolaEventi() {
         if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
             // Costruisci direttamente il template CARD utilizzando la sintassi dei template string
             var cardHTML = `
-                <div class="card-evento">
-                   <div class="event-date">
-                       <div class="event-day">${data.toLocaleString('default', { weekday: 'short' }).toUpperCase()}</div>
-                       <div class="event-number">${data.getDate()}</div>
-                       <div class="event-month">${data.toLocaleString('default', { month: 'short' }).toUpperCase()}</div>
-                   </div>
-                   <div class="event-details">
-                       <div class="event-name">${evento.nome}</div>
-                       <div class="event-location">${evento.luogo}</div>
-                       ${evento.indirizzo ? `<a href="${evento.indirizzoLink}" class="event-address" target="_blank">${evento.indirizzo}</a>` : ''}
-                   </div>
-               </div>
+                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; flex-direction: column; align-items:center; background-color:#ffffff22; ${evento.link ? 'cursor:pointer;' : ''}" ${evento.link ? `onclick="if('${evento.link}') window.location.href = '${evento.link}';"` : ''}>
+                    <div style="text-align: center;">
+                        <div class="event-day" style="font-size: 20px;">${data.toLocaleString('default', { weekday: 'short' }).toUpperCase()}</div>
+                        <div class="event-date" style="font-size: 34px; font-weight: bold;">${data.getDate()}</div>
+                        <div class="event-month" style="font-size: 20px;">${data.toLocaleString('default', { month: 'short' }).toUpperCase()}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="event-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase;">${evento.nome}</div>
+                        <div class="event-location" style="font-size: 16px;">${evento.luogo}</div>
+                        ${evento.indirizzo ? `<a href="${evento.indirizzoLink}" class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer;" target="_blank">${evento.indirizzo}</a>` : ''}
+                    </div>
+                </div>
             `;
 
             // Aggiungi la CARD HTML al container degli eventi
