@@ -1,7 +1,7 @@
 // Dati degli eventi
 var arEventi = [
    { nome: 'Festa di Case di Coccia', data: '29/06/2024', luogo: 'Case di Coccia - Folignano (AP)', link: ''},
-   { nome: 'Sagra della Tagliata', data: '18/07/2024', luogo: 'Piane di Morro - Folignano (AP)', link: 'https://example.com'},
+   { nome: 'Sagra della Tagliata', data: '18/07/2024', luogo: 'Piane di Morro - Folignano (AP)', link: ''},
 ];
 
 function popolaEventi() {
