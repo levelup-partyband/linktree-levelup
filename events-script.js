@@ -24,7 +24,7 @@ function popolaEventi() {
       var data = new Date(dataFormatted);
 
       // Verifica se la data è valida e se non è passata
-      if (!isNaN(data.getTime()) && data >= oggi) {
+      if (!isNaN(data.getTime()) && data >= oggi || data.getDate() === oggi.getDate()) {
          // Clona il template
          var clone = eventTemplate.content.cloneNode(true);
 
