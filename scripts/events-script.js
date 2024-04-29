@@ -21,7 +21,7 @@ function popolaEventi() {
         if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
             // Costruisci direttamente il template CARD utilizzando la sintassi dei template string
             var cardHTML = `
-                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; flex-direction: column; align-items:center; background-color:#ffffff22; cursor:pointer;" onclick="if('${evento.link}') window.location.href = '${evento.link}';">
+                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; flex-direction: column; align-items:center; background-color:#ffffff22; ${evento.link ? 'cursor:pointer;' : ''}" ${evento.link ? `onclick="if('${evento.link}') window.location.href = '${evento.link}';"` : ''}>
                     <div style="text-align: center;">
                         <div class="event-day" style="font-size: 20px;">${data.toLocaleString('default', { weekday: 'short' }).toUpperCase()}</div>
                         <div class="event-date" style="font-size: 34px; font-weight: bold;">${data.getDate()}</div>
@@ -40,4 +40,3 @@ function popolaEventi() {
         }
     });
 }
-
