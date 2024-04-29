@@ -16,7 +16,6 @@ function popolaEventi() {
         var dataParts = evento.data.split('/');
         var dataFormatted = dataParts[1] + '/' + dataParts[0] + '/' + dataParts[2];
         var data = new Date(dataFormatted);
-
        
         // Verifica se la data è valida e se non è passata
         if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
