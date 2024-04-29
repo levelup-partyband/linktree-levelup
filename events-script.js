@@ -6,7 +6,12 @@ var arEventi = [
       luogo: 'Case di Coccia - Folignano (AP)',
       link: ''
    },
-   // Altri eventi...
+  {
+      nome: 'Sagra della Tagliata',
+      data: '18/07/2024',
+      luogo: 'Piane di Morro - Folignano (AP)',
+      link: ''
+   },
 ];
 
 // Funzione per popolare gli eventi nel documento HTML
