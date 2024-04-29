@@ -826,6 +826,64 @@ body {
   border: 6px solid transparent;
   background-clip: content-box;
 }
+
+
+.card {
+    flex: 0 0 80%;
+    padding: 10px;
+    max-width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff22;
+}
+
+.link {
+    cursor: pointer;
+}
+
+.card-evento {
+    /* Stili comuni per la card degli eventi */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-evento:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-evento .event-day {
+    font-size: 20px;
+}
+
+.card-evento .event-date {
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.card-evento .event-month {
+    font-size: 20px;
+}
+
+.card-evento .event-name {
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card-evento .event-location {
+    font-size: 16px;
+}
+
+.card-evento .event-address {
+    font-size: 12px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
