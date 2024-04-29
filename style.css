@@ -274,5 +274,5 @@ body {
 }
 
 .card-evento:hover .event-address {
-    color: var(--accentColor); /* Cambia il colore del testo del link quando si passa sopra la card */
+    color: var(--bgColor); /* Cambia il colore del testo del link quando si passa sopra la card */
 }
