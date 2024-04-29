@@ -30,7 +30,19 @@
       <h4 style="color:white; margin:10px 0; padding:0 10px">Prossimi Eventi</h4>
       <div id="event-container" class="slider-container" style="padding: 0 10px; overflow-x: auto; white-space: nowrap; display:flex; gap:10px">
          <!-- Gli eventi verranno popolati qui dinamicamente -->
-          <script>popolaEventi();</script>
+          <template id="event-template">
+            <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; align-items:center; background-color:#ffffff22">
+               <div style="flex: 1; text-align: center; padding:0 5px;">
+                  <div class="event-day" style="font-size: 20px;"></div>
+                  <div class="event-date" style="font-size: 34px; font-weight: bold;"></div>
+                  <div class="event-month" style="font-size: 20px;"></div>
+               </div>
+               <div style="flex: 7; text-align: center;">
+                  <div class="event-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase"></div>
+                  <div class="event-location" style="font-size: 16px;"></div>
+               </div>
+            </div>
+         </template>
       </div>
    </div>
 
