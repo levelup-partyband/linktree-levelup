@@ -21,7 +21,7 @@ function popolaEventi() {
         if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
             // Costruisci direttamente il template CARD utilizzando la sintassi dei template string
             var cardHTML = `
-                <div class="card link card-evento">
+                <div class="card-evento">
                    <div class="event-date">
                        <div class="event-day">${data.toLocaleString('default', { weekday: 'short' }).toUpperCase()}</div>
                        <div class="event-number">${data.getDate()}</div>
