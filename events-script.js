@@ -20,6 +20,7 @@ function popolaEventi() {
 
    // Per ogni evento nell'array
    arEventi.forEach(function(evento) {
+      console.log('evento:',evento);
       // Creiamo la card dell'evento
       var card = document.createElement('div');
       card.classList.add('card', 'link');
