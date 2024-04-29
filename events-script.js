@@ -22,19 +22,29 @@ function popolaEventi() {
 
    // Per ogni evento nell'array
    arEventi.forEach(function(evento) {
-      console.log('evento:',evento);
       // Clona il template
       var clone = eventTemplate.content.cloneNode(true);
 
       // Popola i dati dell'evento nel clone
-      var dataEvento = new Date(evento.data);
-      clone.querySelector('.event-day').textContent = dataEvento.toLocaleDateString('it-IT', { weekday: 'short' }).toUpperCase();
-      clone.querySelector('.event-date').textContent = dataEvento.getDate();
-      clone.querySelector('.event-month').textContent = dataEvento.toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
       clone.querySelector('.event-name').textContent = evento.nome;
       clone.querySelector('.event-location').textContent = evento.luogo;
 
-      // Aggiungi il clone al container degli eventi
-      eventContainer.appendChild(clone);
+      // Converte la data nel formato corretto (MM/GG/YYYY)
+      var dataParts = evento.data.split('/');
+      var dataFormatted = dataParts[1] + '/' + dataParts[0] + '/' + dataParts[2];
+      var data = new Date(dataFormatted);
+
+      // Verifica se la data è valida prima di continuare
+      if (!isNaN(data.getTime())) {
+         clone.querySelector('.event-day').textContent = data.toLocaleString('default', { weekday: 'short' }).toUpperCase();
+         clone.querySelector('.event-date').textContent = data.getDate();
+         clone.querySelector('.event-month').textContent = data.toLocaleString('default', { month: 'short' }).toUpperCase();
+
+         // Aggiungi il clone al container degli eventi
+         eventContainer.appendChild(clone);
+      } else {
+         console.error('Data non valida:', evento.data);
+      }
    });
 }
+
