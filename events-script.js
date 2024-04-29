@@ -18,39 +18,23 @@ console.log('arEventi:',arEventi);
 // Funzione per popolare gli eventi nel documento HTML
 function popolaEventi() {
    var eventContainer = document.getElementById('event-container');
+   var eventTemplate = document.getElementById('event-template');
 
    // Per ogni evento nell'array
    arEventi.forEach(function(evento) {
       console.log('evento:',evento);
-      // Creiamo la card dell'evento
-      var card = document.createElement('div');
-      card.classList.add('card', 'link');
-      card.style.flex = '0 0 80%';
-      card.style.padding = '10px';
-      card.style.maxWidth = '100%';
-      card.style.margin = '0';
-      card.style.display = 'flex';
-      card.style.alignItems = 'center';
-      card.style.backgroundColor = '#ffffff22';
+      // Clona il template
+      var clone = eventTemplate.content.cloneNode(true);
 
-      // Costruiamo il contenuto della card dell'evento
+      // Popola i dati dell'evento nel clone
       var dataEvento = new Date(evento.data);
-      card.innerHTML = `
-         <div style="flex: 1; text-align: center; padding:0 5px;">
-            <div style="font-size: 20px;">${dataEvento.toLocaleDateString('it-IT', { weekday: 'short' }).toUpperCase()}</div>
-            <div style="font-size: 34px; font-weight: bold;">${dataEvento.getDate()}</div>
-            <div style="font-size: 20px;">${dataEvento.toLocaleDateString('it-IT', { month: 'short' }).toUpperCase()}</div>
-         </div>
-         <div style="flex: 7; text-align: center;">
-            <div style="font-size: 20px; font-weight: bold; text-transform: uppercase">${evento.nome}</div>
-            <div style="font-size: 16px;">${evento.luogo}</div>
-         </div>
-      `;
+      clone.querySelector('.event-day').textContent = dataEvento.toLocaleDateString('it-IT', { weekday: 'short' }).toUpperCase();
+      clone.querySelector('.event-date').textContent = dataEvento.getDate();
+      clone.querySelector('.event-month').textContent = dataEvento.toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
+      clone.querySelector('.event-name').textContent = evento.nome;
+      clone.querySelector('.event-location').textContent = evento.luogo;
 
-      // Aggiungiamo la card dell'evento al container degli eventi
-      eventContainer.appendChild(card);
+      // Aggiungi il clone al container degli eventi
+      eventContainer.appendChild(clone);
    });
 }
-
-// Chiamata alla funzione per popolare gli eventi
-popolaEventi();
