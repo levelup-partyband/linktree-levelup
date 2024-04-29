@@ -265,14 +265,7 @@ body {
   background-color: #a8bbbf;
 }
 
-.event-address {
-    color: white; /* Imposta il colore del testo del link su bianco */
-    font-size: 12px;
-    margin-top: 2px;
-    cursor: pointer;
-    transition: color 0.3s ease; /* Aggiungi una transizione per la transizione del colore */
-}
-
 .link:hover .event-address {
     color: var(--bgColor); /* Cambia il colore del testo del link quando si passa sopra la card */
 }
+
