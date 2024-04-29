@@ -33,13 +33,16 @@ function popolaEventi() {
       var dataParts = evento.data.split('/');
       var dataFormatted = dataParts[1] + '/' + dataParts[0] + '/' + dataParts[2];
       var data = new Date(dataFormatted);
+      console.log(dataParts, dataFormatted, data);
 
       // Verifica se la data è valida prima di continuare
       if (!isNaN(data.getTime())) {
+         console.log('!isNan');
          clone.querySelector('.event-day').textContent = data.toLocaleString('default', { weekday: 'short' }).toUpperCase();
          clone.querySelector('.event-date').textContent = data.getDate();
          clone.querySelector('.event-month').textContent = data.toLocaleString('default', { month: 'short' }).toUpperCase();
-
+         console.log('clone:',clone);
+         
          // Aggiungi il clone al container degli eventi
          eventContainer.appendChild(clone);
       } else {
