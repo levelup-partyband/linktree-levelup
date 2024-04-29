@@ -830,6 +830,21 @@ body {
   background-color: #a8bbbf;
 }
 
+// CARD TEMPLATE EVENTO
+.card {
+    flex: 0 0 80%;
+    padding: 10px;
+    max-width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff22;
+}
+
+.link {
+    cursor: pointer;
+}
 
 .card-evento {
     flex: 0 0 80%;
