@@ -13,6 +13,7 @@ var arEventi = [
       link: ''
    },
 ];
+console.log('arEventi:',arEventi);
 
 // Funzione per popolare gli eventi nel documento HTML
 function popolaEventi() {
