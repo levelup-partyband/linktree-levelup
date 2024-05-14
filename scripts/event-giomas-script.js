@@ -1,17 +1,31 @@
 // Dati degli eventi
-var arEventi = [   
-  { band: "StarLiga - Ligabue Tribute", nome: "Comizio - Venagrande", data: '01/06/2024', confermata: true, },
-  { band: "Jam Quintet - Italian Tribute", nome: "Kasì Bar", data: '02/06/2024', confermata: true, },
-  { band: "StarLiga - Ligabue Tribute", nome: "???", data: '07/06/2024',  confermata: false, },
+const arEventi = [   
+  { band: "StarLiga - Ligabue tribute", nome: "Comizio - Venagrande", data: '01/06/2024', confermata: true, },
+  { band: "Jam Quintet - Italian tribute", nome: "Kasì Bar", data: '02/06/2024', confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "???", data: '07/06/2024',  confermata: false, },
   { band: "Various Artist", nome: "RETROMANIA 80", data: '08/06/2024',  confermata: false, },
   { band: "Level Up - party band", nome: "Festa di Sant'Antonio", data: '15/06/2024', confermata: true, luogo: 'Spelonga (AP)', link: '', indirizzo: '', indirizzoLink: '' },
-  { band: "StarLiga - Ligabue Tribute", nome: "Sestiere di Porta Maggiore", data: '21/06/2024',  confermata: false, },
-  { band: "Level Up - party band", nome: 'Festa di Case di Coccia', data: '29/06/2024', luogo: 'Case di Coccia - Folignano (AP)', link: '', indirizzo: 'Piazza di Via Ivrea, Case di Coccia (AP)', indirizzoLink: 'https://maps.app.goo.gl/Te7qTcCRs8eUL9B79' },
+  { band: "StarLiga - Ligabue tribute", nome: "Sestiere di Porta Maggiore", data: '21/06/2024',  confermata: false, },
+  { band: "Level Up - party band", nome: 'Festa di Case di Coccia', data: '29/06/2024', confermata: true , luogo: 'Case di Coccia - Folignano (AP)', link: '', indirizzo: 'Piazza di Via Ivrea, Case di Coccia (AP)', indirizzoLink: 'https://maps.app.goo.gl/Te7qTcCRs8eUL9B79' },
+
+  { band: "Level Up - party band", nome: "Festa Società Sportiva Monsampolo", data: '07/07/2024', confermata: false, luogo: 'Piane di Morro - Folignano (AP)', link: '', indirizzo: 'Piazza Giovanni Paolo II, Piane di Morro (AP)', indirizzoLink: 'https://maps.app.goo.gl/o8VwZFkG4ZLWJ1qB9' },
+  { band: "In Rock - Deep Purple tribute", nome: "opening - Heros & Monsters", data: '14/07/2024', confermata: true, luogo: 'Piane di Morro - Folignano (AP)', link: '', indirizzo: 'Piazza Giovanni Paolo II, Piane di Morro (AP)', indirizzoLink: 'https://maps.app.goo.gl/o8VwZFkG4ZLWJ1qB9' },
+  { band: "Level Up - party band", nome: 'Sagra della Tagliata', data: '18/07/2024', confermata: true, luogo: 'Piane di Morro - Folignano (AP)', link: '', indirizzo: 'Piazza Giovanni Paolo II, Piane di Morro (AP)', indirizzoLink: 'https://maps.app.goo.gl/o8VwZFkG4ZLWJ1qB9' },
+  { band: "StarLiga - Ligabue tribute", nome: "Sagra de Lu Bocculotte co lu Castrate", data: '19/07/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "San Benedetto", data: '21/07/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Gagliano di Campli", data: '25/06/2024',  confermata: true, },
   
-  { nome: 'Sagra della Tagliata', data: '18/07/2024', luogo: 'Piane di Morro - Folignano (AP)', link: '', indirizzo: 'Piazza Giovanni Paolo II, Piane di Morro (AP)', indirizzoLink: 'https://maps.app.goo.gl/o8VwZFkG4ZLWJ1qB9' },
-  
-  { nome: 'Piazzetta e Campari', data: '01/08/2024', luogo: "Sant'Egidio di Monsampolo", link: '', indirizzo: '', indirizzoLink: '' },
-  { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: '', link: '', indirizzo: '', indirizzoLink: '' },
+  { band: "Level Up - party band", nome: 'Piazzetta e Campari', data: '01/08/2024',  confermata: true, luogo: "Sant'Egidio di Monsampolo", link: '', indirizzo: '', indirizzoLink: '' },
+  { band: "StarLiga - Ligabue tribute", nome: "Aquilano di Tossicia", data: '03/08/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Force", data: '04/08/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Monteprandone", data: '05/08/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Ripattoni di Bellante", data: '15/08/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Falciano", data: '24/08/2024',  confermata: true, },
+  { band: "StarLiga - Ligabue tribute", nome: "Tommy's Cafè", data: '30/08/2024',  confermata: true, },
+  { band: "Level Up - party band", nome: "Memorial Villa Marchesa", data: '31/08/2024',  confermata: false,false},
+
+  { band: "StarLiga - Ligabue tribute", nome: "Santa Maria di Acquasanta", data: '08/09/2024',  confermata: true, },
+  { band: "Level Up - party band", nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: '', link: '', indirizzo: '', indirizzoLink: '' },
 ];
 // { nome: 'Festa Società Sportiva', data: '07/07/2024', luogo: "Monsampolo", link: '', indirizzo: '', indirizzoLink: '' },
 
