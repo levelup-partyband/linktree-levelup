@@ -47,3 +47,8 @@ function popolaEventi() {
         }
     });
 }
+
+function apriLink(link) {
+  if (link) 
+    window.open(link, '_blank');
+}
