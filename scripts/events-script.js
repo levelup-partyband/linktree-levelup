@@ -37,7 +37,7 @@ function popolaEventi() {
                  <div style="flex: 7; text-align: center;">
                      <div class="event-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase;">${evento.nome}</div>
                      <div class="event-location" style="font-size: 16px;">${evento.luogo}</div>
-                     ${evento.indirizzo ? `<a class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer; z-index:999;" onclick="apriLink('${evento.indirizzoLink}')">${evento.indirizzo}</a>` : ''}
+                     ${evento.indirizzo ? `<a class="event-address" style="font-size: 12px; margin-top:2px; cursor: pointer; z-index:999; text-decoration:${evento.indirizzo ? 'underline':'none'}" onclick="apriLink('${evento.indirizzoLink}')">${evento.indirizzo}</a>` : ''}
                  </div>
              </div>
             `;
