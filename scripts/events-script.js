@@ -9,13 +9,14 @@ var arEventi = [
    { nome: 'Festa in Campagna', data: '31/08/2024', luogo: 'Tassanare di Rosora (AN)', link: 'https://www.facebook.com/FestaTassanare', indirizzo: 'Tassanare di Rosora (AN)', indirizzoLink: 'https://maps.app.goo.gl/CpeHn3qmBQVEpsAj8' },
    { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: '', link: '', indirizzo: '', indirizzoLink: '' },
 ];
-// { nome: 'Festa Società Sportiva', data: '07/07/2024', luogo: "Monsampolo", link: '', indirizzo: '', indirizzoLink: '' },
 
 function popolaEventi() {
     var eventContainer = document.getElementById('event-container');
 
     // Ottieni la data odierna per confrontarla con le date degli eventi
     var oggi = new Date();
+    oggi.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte per il confronto corretto
+
 
     // Per ogni evento nell'array
     arEventi.forEach(function(evento) {
@@ -25,7 +26,7 @@ function popolaEventi() {
         var data = new Date(dataFormatted);
        
         // Verifica se la data è valida e se non è passata
-        if (!isNaN(data.getTime()) && (data >= oggi || data.getDate() === oggi.getDate())) {
+        if (!isNaN(data.getTime()) && (data >= oggi)) {
             // Costruisci direttamente il template CARD utilizzando la sintassi dei template string
             var cardHTML = `
                <div class="card link" style="flex:0 0 80%; padding: 10px; max-width: 100%; margin:0; display: flex; align-items:center; background-color:#ffffff22; cursor: ${evento.link ? 'pointer' : 'default'}" onclick="apriLink('${evento.link}')">
