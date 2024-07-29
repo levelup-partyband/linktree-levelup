@@ -1,7 +1,7 @@
 // Dati degli eventi
 var arEventi = [   
    // { nome: "Festa di Sant'Antonio", data: '15/06/2024', luogo: 'Spelonga (AP)', link: '', indirizzo: '', indirizzoLink: '' },
-   { nome: 'Festa di Case di Coccia', data: '29/06/2024', luogo: 'Case di Coccia - Folignano (AP)', link: 'https://www.facebook.com/events/2188491668194611/', indirizzo: 'Piazza di Via Ivrea, Case di Coccia (AP)', indirizzoLink: 'https://maps.app.goo.gl/Te7qTcCRs8eUL9B79' },
+   { nome: 'Sagra di Case di Coccia', data: '29/06/2024', luogo: 'Case di Coccia - Folignano (AP)', link: 'https://www.facebook.com/events/2188491668194611/', indirizzo: 'Piazza di Via Ivrea, Case di Coccia (AP)', indirizzoLink: 'https://maps.app.goo.gl/Te7qTcCRs8eUL9B79' },
    { nome: '"Settimana Santa" Biancorossa', data: '08/07/2024', luogo: 'Sestiere Piazzarola - Ascoli Piceno (AP)', link: 'https://www.facebook.com/events/1003807131250235/', indirizzo: 'Via della Cartiera, 1, 63100 Ascoli Piceno AP', indirizzoLink: 'https://maps.app.goo.gl/uqoh7dRdUKPyobdE7' },
    { nome: 'Sagra della Tagliata', data: '18/07/2024', luogo: 'Piane di Morro - Folignano (AP)', link: 'https://www.facebook.com/events/1272323350820389/', indirizzo: 'Piazza Giovanni Paolo II, Piane di Morro (AP)', indirizzoLink: 'https://maps.app.goo.gl/o8VwZFkG4ZLWJ1qB9' },
    { nome: 'Castorano Experiences - Borgo Aperto', data: '28/07/2024', luogo: 'Castorano (AP)', link: 'https://www.facebook.com/events/1204267337567299/', indirizzo: 'Piazza Belvedere, Castorano (AP)', indirizzoLink: 'https://maps.app.goo.gl/Y5RRP7LmbFKS8x7V9' },
