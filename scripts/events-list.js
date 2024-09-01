@@ -6,5 +6,6 @@ var arEventi = [
    { nome: 'Castorano Experiences - Borgo Aperto', data: '28/07/2024', luogo: 'Castorano (AP)', link: 'https://www.facebook.com/events/1204267337567299/', indirizzo: 'Piazza Belvedere, Castorano (AP)', indirizzoLink: 'https://maps.app.goo.gl/Y5RRP7LmbFKS8x7V9' },
    { nome: 'Piazzetta e Campari', data: '01/08/2024', luogo: "Sant'Egidio di Monsampolo (AP)", link: 'https://www.facebook.com/events/320271224484642/', indirizzo: "Contrada Sant'Egidio, 45 B, 63077 Monsampolo (AP)", indirizzoLink: 'https://maps.app.goo.gl/sS3irn2B1tdxnTRs8' },
    { nome: 'Festa in Campagna', data: '31/08/2024', luogo: 'Tassanare di Rosora (AN)', link: 'https://www.facebook.com/FestaTassanare', indirizzo: 'Tassanare di Rosora (AN)', indirizzoLink: 'https://maps.app.goo.gl/CpeHn3qmBQVEpsAj8' },
-   { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: '', link: '', indirizzo: '', indirizzoLink: '' },
+   { nome: 'Maxelà', data: '06/09/2024', luogo: 'Ascoli Piceno', link: 'https://www.facebook.com/share/Bhg8hdHitSsT958E/', indirizzo: 'Via Tornasacco, 7, 63100 Ascoli Piceno AP', indirizzoLink: 'https://maps.app.goo.gl/tBGiskCGwXKSiWry7' },
+   { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: 'Monteprandone (AP)', link: '', indirizzo: '', indirizzoLink: '' },
 ];
