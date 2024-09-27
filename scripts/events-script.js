@@ -20,7 +20,7 @@ function popolaEventi() {
     if (eventiFuturi.length === 0) {
         // Mostra il messaggio "Date in aggiornamento" se non ci sono eventi futuri
         eventContainer.innerHTML = `
-            <div style="text-align: center; font-size: 20px; font-weight: bold; padding: 20px;">
+            <div style="text-align: center; font-size: 20px; font-weight: bold; color: white; padding: 20px;">
                 Date in aggiornamento
             </div>
         `;
