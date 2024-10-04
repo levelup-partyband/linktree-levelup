@@ -102,34 +102,12 @@
       </div>
    </div>
 
-   // BOTTONE SHARE ------------------------------------------------------------
+   <!-- BOTTONE SHARE ------------------------------------------------------------ -->
    <div id="links" style="padding:0 10px">
       <h4 style="color:white; margin:10px 0">Condividi questa pagina</h4>
       <button id="shareButton" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px;">Condividi</button>
    </div>
-   
-   <script>
-      // Controlla se il browser supporta l'API di condivisione
-      const shareButton = document.getElementById('shareButton');
-   
-      shareButton.addEventListener('click', async () => {
-         if (navigator.share) {
-            try {
-               await navigator.share({
-                  title: 'Level Up - party band',
-                  text: 'Scopri la nostra band, clicca qui per maggiori informazioni!',
-                  url: window.location.href // Condivide l'URL della pagina corrente
-               });
-               console.log('Contenuto condiviso con successo');
-            } catch (error) {
-               console.error('Errore durante la condivisione:', error);
-            }
-         } else {
-            alert('La condivisione non è supportata su questo dispositivo o browser');
-         }
-      });
-   </script>
-   // --------------------------------------------------------------------------
+   <!-- -------------------------------------------------------------------------- -->
    
    <div style="text-align:center; color:white; padding-bottom:16px; font-size:14px">v.1.0.15</div>
 
