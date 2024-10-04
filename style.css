@@ -68,7 +68,10 @@ body {
     border-radius: 7px;
     font-size: 1rem;
     text-align: center;
-    display: block;
+    /* display: block; */
+    display:flex;
+    justify-content:center;
+    align-itmes:center;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
