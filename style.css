@@ -90,6 +90,15 @@ body {
     color: var(--bgColor);
 }
 
+.social-icons{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  margin: 0 0 10px 0;
+  font-size: 30px;
+}
+
 #hashtag {
     position: relative;
     padding-bottom: 20px;
