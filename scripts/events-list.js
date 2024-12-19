@@ -8,5 +8,5 @@ var arEventi = [
    { nome: 'Festa in Campagna', data: '31/08/2024', luogo: 'Tassanare di Rosora (AN)', link: 'https://www.facebook.com/FestaTassanare', indirizzo: 'Tassanare di Rosora (AN)', indirizzoLink: 'https://maps.app.goo.gl/CpeHn3qmBQVEpsAj8' },
    { nome: 'Maxelâ', data: '06/09/2024', luogo: 'Ascoli Piceno', link: 'https://www.facebook.com/share/Bhg8hdHitSsT958E/', indirizzo: 'Via Tornasacco, 7, 63100 Ascoli Piceno AP', indirizzoLink: 'https://maps.app.goo.gl/tBGiskCGwXKSiWry7' },
    { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: 'Monteprandone (AP)', link: '', indirizzo: '', indirizzoLink: '' },
-   { nome: 'Capodanno 2025', data: '31/12/2024', luogo: 'Albergo Ristorante Terme', link: 'https://www.facebook.com/events/573668735379455/', indirizzo: 'P.za Terme, 20, 63095 Acquasanta Terme (AP)', indirizzoLink: 'https://maps.app.goo.gl/b1e1UpB2zoqSAy7n8' },
+   { nome: 'Capodanno 2025', data: '31/12/2024', luogo: 'Albergo Ristorante Terme - Acquasanta Terme (AP)', link: 'https://www.facebook.com/events/573668735379455/', indirizzo: 'P.za Terme, 20, 63095 Acquasanta Terme (AP)', indirizzoLink: 'https://maps.app.goo.gl/b1e1UpB2zoqSAy7n8' },
 ];
