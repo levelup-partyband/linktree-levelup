@@ -9,6 +9,7 @@ var arEventi = [
    { nome: 'Maxelâ', data: '06/09/2024', luogo: 'Ascoli Piceno', link: 'https://www.facebook.com/share/Bhg8hdHitSsT958E/', indirizzo: 'Via Tornasacco, 7, 63100 Ascoli Piceno AP', indirizzoLink: 'https://maps.app.goo.gl/tBGiskCGwXKSiWry7' },
    { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: 'Monteprandone (AP)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: 'Capodanno 2025', data: '31/12/2024', luogo: 'Albergo Ristorante Terme - Acquasanta Terme (AP)', link: 'https://www.facebook.com/events/573668735379455/', indirizzo: 'P.za Terme, 20, 63095 Acquasanta Terme (AP)', indirizzoLink: 'https://maps.app.goo.gl/b1e1UpB2zoqSAy7n8' },
+   { nome: 'SAgra delle Crepes 2025', data: '08/06/2025', luogo: 'Chiesa dei Frati - Ascoli Piceno (AP)', link: '', indirizzo: 'Via Assisi, 2, 63100 Ascoli Piceno AP', indirizzoLink: 'https://g.co/kgs/nxZtRpD' },
    { nome: 'Festa Privata - Matrimonio', data: '14/06/2025', luogo: 'Marina Palmense (FM)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: 'Festa', data: '21/06/2025', luogo: 'Melfi (PZ)', link: '', indirizzo: '', indirizzoLink: '' },
 ];
