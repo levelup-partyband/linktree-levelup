@@ -1,7 +1,9 @@
 let arEventi = [   
-   { nome: 'Sagra delle Crepes 2025', data: '08/06/2025', luogo: 'Chiesa dei Frati - Ascoli Piceno (AP)', link: '', indirizzo: 'Via Assisi, 2, 63100 Ascoli Piceno AP', indirizzoLink: 'https://g.co/kgs/nxZtRpD' },
+   { nome: 'Sagra delle Crepes 2025', data: '08/06/2025', luogo: 'Chiesa dei Frati - Ascoli Piceno (AP)', link: 'https://www.facebook.com/events/689821517127706/', indirizzo: 'Via Assisi, 2, 63100 Ascoli Piceno AP', indirizzoLink: 'https://g.co/kgs/nxZtRpD' },
    { nome: 'Festa Privata - Matrimonio', data: '14/06/2025', luogo: 'Marina Palmense (FM)', link: '', indirizzo: '', indirizzoLink: '' },
-   { nome: 'Festa', data: '21/06/2025', luogo: 'Melfi (PZ)', link: '', indirizzo: '', indirizzoLink: '' },
+   { nome: 'Moto Giro FMI', data: '21/06/2025', luogo: 'Melfi (PZ)', link: 'https://www.facebook.com/events/1203175651273608/', indirizzo: 'Via della Cittadinanza Attiva, 85025, Melfi PZ', indirizzoLink: 'https://maps.app.goo.gl/zE2mZGGLH64oPDHf8' },
+   { nome: '24° Sagra dei Maccheroncini alla Pagliarana', data: '21/06/2025', luogo: 'Pagliare del Tronto (AP)', link: 'https://www.facebook.com/events/687396143877688/', indirizzo: 'Piazza Kennedy, 63078 Pagliare del Tronto AP', indirizzoLink: 'https://maps.app.goo.gl/hrujjeCpyioHprJF6' },
+   { nome: 'Ferragosto', data: '21/06/2025', luogo: 'Grottammare (AP)', link: 'https://www.facebook.com/events/664786599737380/', indirizzo: 'Piazza Pericle Fazzini, Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/owku9aeAHm6BPfxD7' },
 ];
 
 let arEventi2024 = [
