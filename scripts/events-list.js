@@ -6,8 +6,8 @@ let arEventi = [
    { nome: 'Chalet Mimosa 45', data: '10/07/2025', luogo: 'Grottammare (AP)', link: 'https://www.facebook.com/events/689821517127706/', indirizzo: 'Lungomare della Repubblica, 45, 63066 Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/rA84smajfJGYoykT6' },
    { nome: 'Un Borgo di Birra', data: '14/07/2025', luogo: 'Civitella del Tronto (TE)', link: 'https://www.facebook.com/events/1157773279452054/', indirizzo: 'Piazza Filippi Pepe, 64010, Civitella del Tronto TE', indirizzoLink: 'https://maps.app.goo.gl/m3zNNFzuZawKYEB59' },
    { nome: '24° Sagra dei<br>Maccheroncini alla Pagliarana', data: '31/07/2025', luogo: 'Pagliare del Tronto (AP)', link: 'https://www.facebook.com/events/687396143877688/', indirizzo: 'Piazza Kennedy, 63078 Pagliare del Tronto AP', indirizzoLink: 'https://maps.app.goo.gl/hrujjeCpyioHprJF6' },
-   { nome: "Chalet Casablanca", data: '04/08/2024', luogo: "Porto d'Ascoli (AP)", link: 'https://www.facebook.com/events/1410838586779442', indirizzo: 'Viale Rinascimento, 8, 63074 San Benedetto del Tronto AP', indirizzoLink: 'https://maps.app.goo.gl/iHpkKCW4qGqk4Uxp6' },
-   { nome: 'Festa Privata - Compleanno', data: '14/06/2025', luogo: 'Ascoli Piceno (AP)', link: '', indirizzo: '', indirizzoLink: '' },
+   { nome: "Chalet Casablanca", data: '04/08/2025', luogo: "Porto d'Ascoli (AP)", link: 'https://www.facebook.com/events/1410838586779442', indirizzo: 'Viale Rinascimento, 8, 63074 San Benedetto del Tronto AP', indirizzoLink: 'https://maps.app.goo.gl/iHpkKCW4qGqk4Uxp6' },
+   { nome: 'Festa Privata - Compleanno', data: '09/08/2025', luogo: 'Ascoli Piceno (AP)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: "Gran Ferragosto", data: '15/08/2025', luogo: "Grottammare (AP)", link: 'https://www.facebook.com/events/664786599737380/', indirizzo: 'Piazza Pericle Fazzini, Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/owku9aeAHm6BPfxD7' },
    { nome: "Memorial", data: '30/08/2024', luogo: "Villa Marchesa, Sant'Edigio (TE)", link: 'https://www.facebook.com/events/2881021962101341/', indirizzo: '', indirizzoLink: '' },
 ];
