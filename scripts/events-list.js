@@ -9,7 +9,7 @@ let arEventi = [
    { nome: "Chalet Casablanca", data: '04/08/2025', luogo: "Porto d'Ascoli (AP)", link: 'https://www.facebook.com/events/1410838586779442', indirizzo: 'Viale Rinascimento, 8, 63074 San Benedetto del Tronto AP', indirizzoLink: 'https://maps.app.goo.gl/iHpkKCW4qGqk4Uxp6' },
    { nome: 'Festa Privata - Compleanno', data: '09/08/2025', luogo: 'Ascoli Piceno (AP)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: "Gran Ferragosto", data: '15/08/2025', luogo: "Grottammare (AP)", link: 'https://www.facebook.com/events/664786599737380/', indirizzo: 'Piazza Pericle Fazzini, Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/owku9aeAHm6BPfxD7' },
-   { nome: "Memorial", data: '30/08/2024', luogo: "Villa Marchesa, Sant'Edigio (TE)", link: 'https://www.facebook.com/events/2881021962101341/', indirizzo: '', indirizzoLink: '' },
+   { nome: "Memorial", data: '30/08/2025', luogo: "Villa Marchesa, Sant'Edigio (TE)", link: 'https://www.facebook.com/events/2881021962101341/', indirizzo: '', indirizzoLink: '' },
 ];
 let arEventi2024 = [
    // { nome: "Festa di Sant'Antonio", data: '15/06/2024', luogo: 'Spelonga (AP)', link: '', indirizzo: '', indirizzoLink: '' },
