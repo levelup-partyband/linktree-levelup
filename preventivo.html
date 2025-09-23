@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preventivo Level Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&family=Bebas+Neue&display=swap');
+        
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #f0f0f5; /* Light mode default */
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            background-color: #ffffff;
+            border-color: #e5e7eb;
+        }
+        
+        .section-card {
+            background-color: #f9fafb;
+            border-color: #e5e7eb;
+        }
+
+        .band-card {
+            background-color: #f3f4f6;
+            border-color: #e5e7eb;
+            color: #1f2937;
+        }
+        
+        .header-title, .section-title {
+            color: #1f2937;
+        }
+
+        .edit-button {
+            color: #6b7280;
+        }
+        .edit-button:hover {
+            color: #1f2937;
+        }
+
+        .item-card {
+            background-color: #ffffff;
+            border-color: #e5e7eb;
+        }
+        
+        input[type="text"], input[type="number"], input[type="date"], select {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            border-color: #d1d5db;
+        }
+        
+        /* Dark mode styles */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a2e;
+                color: #e0e0e0;
+            }
+            
+            .main-container {
+                background-color: #2a2a47;
+                border-color: #4a4a6b;
+            }
+            
+            .section-card {
+                background-color: #1f1f3b;
+                border-color: #4a4a6b;
+            }
+
+            .band-card {
+                background-color: #3b3b5c;
+                border-color: #4a4a6b;
+                color: #f0f0f0;
+            }
+            
+            .band-card .text-gray-800 {
+                color: #f0f0f0;
+            }
+
+            .band-card .text-gray-600 {
+                color: #d0d0d0;
+            }
+
+            .header-title, .section-title {
+                color: #f0f0f0;
+            }
+
+            .edit-button {
+                color: #e0e0e0;
+            }
+            .edit-button:hover {
+                color: #ffffff;
+            }
+            
+            .item-card {
+                background-color: #2a2a47;
+                border-color: #4a4a6b;
+            }
+            
+            input[type="text"], input[type="number"], input[type="date"], select {
+                background-color: #3b3b5c;
+                color: #f0f0f0;
+                border-color: #4a4a6b;
+            }
+        }
+        
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        /* Sezione per i titoli delle categorie */
+        .section-title {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .item-selected {
+            background-color: #ff0099;
+            color: white;
+            border-color: #b3006b;
+            box-shadow: 0 4px 6px rgba(255, 0, 153, 0.3), 0 1px 3px rgba(255, 0, 153, 0.2);
+        }
+        .item-selected .text-gray-400 {
+            color: white;
+        }
+        .quantity-button {
+            background-color: #ff0099;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .quantity-button:hover {
+            background-color: #e6008a;
+        }
+        .item-selected .quantity-button {
+            background-color: white;
+            color: #ff0099;
+            border: 1px solid #ff0099;
+        }
+        .item-selected .quantity-button:hover {
+            background-color: #f0f0f0;
+        }
+        .item-selected .quantity-span {
+            color: white;
+        }
+        
+        /* Override dark mode for PDF content */
+        #pdf-content {
+            width: 794px; /* A4 width in px at 96 dpi */
+            padding: 40px;
+            box-sizing: border-box;
+            background-color: #f7f3f2;
+            color: #444;
+            font-family: 'Lexend', sans-serif;
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            overflow: hidden;
+        }
+
+        .pdf-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px; /* Ridotto per togliere spazio */
+        }
+
+        .pdf-header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            color: #444;
+            margin-bottom: 0;
+        }
+
+        .pdf-header .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px; /* Spazio sotto il logo */
+        }
+
+        .pdf-header .logo img {
+            width: 200px; /* Aumentato per l'effetto COVER */
+            height: auto;
+        }
+        
+        .pdf-header .logo h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 40px;
+            margin: 0;
+            color: #4a0081;
+        }
+
+        .pdf-header .logo p {
+            font-size: 12px;
+            margin: 0;
+            color: #4a0081;
+        }
+
+        .pdf-client-info {
+            margin-bottom: 40px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .pdf-table th, .pdf-table td {
+            text-align: left;
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .pdf-table th {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .pdf-table .item-cost {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Nuovi stili per il totale parziale */
+        .pdf-table .subtotal-row {
+            font-size: 14px;
+            color: #999;
+            padding-top: 20px;
+        }
+
+        .pdf-table .subtotal-row td {
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .pdf-table .total-row {
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+        
+        .pdf-table .discount-row {
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 1px dashed #ccc;
+            padding-top: 20px;
+            color: #22c55e;
+        }
+
+        .pdf-table .strikethrough-row {
+            text-decoration: line-through;
+            font-size: 14px;
+            color: #999;
+        }
+
+
+        .pdf-terms {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* New styles for edit mode */
+        .item-card.edit-mode {
+            background-color: #e5e7eb; /* Light mode */
+        }
+        @media (prefers-color-scheme: dark) {
+            .item-card.edit-mode {
+                background-color: #3b3b5c; /* Dark mode */
+            }
+        }
+        
+        .delete-button {
+            color: #ef4444;
+            transition: transform 0.2s;
+        }
+        .delete-button:hover {
+            transform: scale(1.1);
+        }
+
+        .add-button {
+            color: #22c55e;
+            transition: transform 0.2s;
+        }
+        .add-button:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 400px;
+            position: relative;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .modal-content {
+                background-color: #2a2a47;
+                color: #e0e0e0;
+            }
+        }
+
+        @keyframes animatetop {
+            from { top:-300px; opacity:0 }
+            to { top:0; opacity:1 }
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #ff0099;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* New toggle switch styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .toggle-switch.is-unique .toggle-slider {
+            background-color: #22c55e;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #ff0099;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center">
+    <div class="max-w-4xl w-full mx-auto p-6 sm:p-8 rounded-lg shadow-xl border main-container">
+        <header class="text-center mb-6">
+            <div class="flex flex-col items-center">
+                <img src="https://levelup-partyband.github.io/linktree-levelup/assets/img/logo-levelup-clear.svg" alt="Logo Level Up" class="w-48 h-auto mb-4" />
+                <p class="text-gray-300 text-sm sm:text-base mt-4">CALCOLA IL TUO PREVENTIVO</p>
+            </div>
+        </header>
+        
+        <div id="band-card" class="mb-6 p-4 rounded-lg shadow-sm border band-card">
+            <!-- Il contenuto della banda verrà reso qui da JavaScript -->
+        </div>
+        
+        <div class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6" id="categories-container">
+                <!-- Le sezioni verranno inserite qui da JavaScript -->
+            </div>
+
+            <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mt-6">
+                <!-- I campi evento sono stati spostati nella modale -->
+            </div>
+            
+            <!-- Campo sconto aggiornato -->
+            <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-600">
+                <span class="text-xl font-semibold">Sconto</span>
+                <input type="number" id="discount-input" placeholder="0,00 €" class="w-40 text-right bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-lg font-bold focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" />
+            </div>
+
+            <!-- Sezione contatti spostata qui -->
+            <div class="mb-6 p-4 rounded-lg shadow-sm border section-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold section-title">Contatti</h2>
+                    <button onclick="toggleContactsEditMode()" class="transition-colors edit-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" id="contacts-edit-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l-6.828 6.828a1 1 0 00-.293.707v3h3a1 1 0 00.707-.293l6.828-6.828m-4.89-4.89a2 2 0 112.828 2.828L15.232 5.232z" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="contacts-list" class="space-y-4">
+                    <!-- I contatti verranno renderizzati qui da JavaScript -->
+                </div>
+            </div>
+
+            <div class="bg-[#5d25e0] p-6 rounded-lg shadow-md border-2 border-[#ff0099] text-white mt-6">
+                <div class="flex flex-col sm:flex-row justify-between items-center">
+                    <span class="text-xl font-semibold mb-2 sm:mb-0">COSTO TOTALE STIMATO</span>
+                    <span id="total-cost" class="text-4xl font-bold text-white tracking-wide">€ 0,00</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center mt-6">
+                <button onclick="showModal()" class="bg-[#ff0099] text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-[#b3006b] focus:outline-none focus:ring-4 focus:ring-[#ff0099] focus:ring-offset-2">
+                    GENERA PREVENTIVO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content main-container">
+            <span class="close-button" onclick="hideModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Dati Evento</h2>
+            <form id="pdfForm" class="space-y-4">
+                <div>
+                    <label for="modal-event-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome Evento</label>
+                    <input type="text" id="modal-event-name" required placeholder="Es. Romana Beer Fest" class="w-full p-2 rounded-md border text-sm main-container focus:ring-[#ff0099] focus:border-[#ff0099]" />
+                </div>
+                <div>
+                    <label for="modal-event-location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Luogo Evento (Opzionale)</label>
+                    <input type="text" id="modal-event-location" placeholder="Es. Roma, Piazza di Spagna" class="w-full p-2 rounded-md border text-sm main-container focus:ring-[#ff0099] focus:border-[#ff0099]" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="modal-event-date-start" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Inizio</label>
+                        <input type="date" id="modal-event-date-start" required class="w-full p-2 rounded-md border text-sm main-container focus:ring-[#ff0099] focus:border-[#ff0099]" />
+                    </div>
+                    <div>
+                        <label for="modal-event-date-end" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Fine (Opzionale)</label>
+                        <input type="date" id="modal-event-date-end" class="w-full p-2 rounded-md border text-sm main-container focus:ring-[#ff0099] focus:border-[#ff0099]" />
+                    </div>
+                </div>
+                <div>
+                    <label for="modal-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Riferimento</label>
+                    <input type="email" id="modal-email" placeholder="nome@esempio.com" class="w-full p-2 rounded-md border text-sm main-container focus:ring-[#ff0099] focus:border-[#ff0099]" />
+                </div>
+                <div class="flex justify-center mt-6">
+                    <button type="submit" class="bg-[#ff0099] text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-[#b3006b] focus:outline-none focus:ring-4 focus:ring-[#ff0099] focus:ring-offset-2">
+                        SCARICA PREVENTIVO
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden PDF content -->
+    <div id="pdf-content">
+        <header class="pdf-header">
+            <div id="pdf-logo-container" class="logo">
+                <img id="pdf-logo" src="https://levelup-partyband.github.io/linktree-levelup/assets/img/logo-levelup-clear.svg" alt="Logo Level Up" style="width: 100px; height: auto;">
+            </div>
+            <div class="w-full text-center">
+                <h1 style="color: #666; font-family: 'Bebas Neue', sans-serif;">PREVENTIVO</h1>
+                <p id="pdf-event-name-location" style="color: #666; font-family: 'Lexend', sans-serif;"></p>
+                <p id="pdf-event-date" style="color: #666; font-family: 'Lexend', sans-serif;"></p>
+                <p id="pdf-email" style="color: #666; font-family: 'Lexend', sans-serif;"></p>
+            </div>
+        </header>
+
+        <div class="pdf-client-info">
+            <p style="font-family: 'Lexend', sans-serif;" id="pdf-contact-name"></p>
+            <p style="font-family: 'Lexend', sans-serif;" id="pdf-contact-phone"></p>
+            <p style="font-family: 'Lexend', sans-serif;" id="pdf-contact-email"></p>
+        </div>
+
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Descrizione</th>
+                    <th style="width: 20%; text-align: center;">Qtà</th>
+                    <th style="width: 30%; text-align: right;">Importo</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-table-body">
+            </tbody>
+            <tfoot>
+                <tr id="pdf-subtotal-row" style="display: none;">
+                    <td class="subtotal-row">TOTALE PARZIALE</td>
+                    <td></td>
+                    <td id="pdf-subtotal" class="subtotal-row" style="text-align: right;">€ 0,00</td>
+                </tr>
+                <tr id="pdf-discount-row" style="display: none;">
+                    <td class="discount-row">SCONTO</td>
+                    <td></td>
+                    <td id="pdf-discount" class="discount-row" style="text-align: right;">€ 0,00</td>
+                </tr>
+                <tr>
+                    <td class="total-row">TOTALE</td>
+                    <td></td>
+                    <td id="pdf-total" class="total-row" style="text-align: right;">€ 0,00</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="pdf-terms">
+            <p>I prezzi sono da considerarsi IVA esclusa.</p>
+            <p>In caso di richiesta di fattura sono esclusi eventuali oneri amministrativi e fiscali.</p>
+        </div>
+    </div>
+
+    <script>
+        // Data e variabili globali
+        let categoriesData = {};
+        let selectedItems = {};
+        let contactsData = [];
+        let selectedContactId = null;
+
+        let editingSection = null;
+        let editingBand = false;
+        let editingContacts = false;
+        let nextItemId = 12;
+        let nextContactId = 1;
+
+        const totalCostElement = document.getElementById('total-cost');
+        const categoriesContainer = document.getElementById('categories-container');
+        const bandCardElement = document.getElementById('band-card');
+        const pdfModal = document.getElementById('pdfModal');
+        const pdfForm = document.getElementById('pdfForm');
+        const discountInput = document.getElementById('discount-input');
+        const contactsList = document.getElementById('contacts-list');
+        const contactsEditIcon = document.getElementById('contacts-edit-icon');
+
+        // Configurazione di default di fallback (utilizzata se non si riesce a caricare il JSON)
+        const FALLBACK_CONFIG = {
+            categoriesData: {
+                "SERVICE": {
+                    isUnique: true,
+                    items: [
+                        { id: 'item1', name: "S1 Service", cost: 650.00, hasQuantity: false },
+                        { id: 'item2', name: "S2 Service", cost: 800.00, hasQuantity: false },
+                        { id: 'item3', name: "S3 Service", cost: 1100.00, hasQuantity: false },
+                        { id: 'item4', name: "S4 Service", cost: 2000.00, hasQuantity: false }
+                    ]
+                },
+                "LEDWALL": {
+                    isUnique: true,
+                    items: [
+                        { id: 'item5', name: "Ledwall 3x2", cost: 300.00, hasQuantity: false },
+                        { id: 'item6', name: "LedWall 4x2", cost: 400.00, hasQuantity: false },
+                        { id: 'item7', name: "Ledwall 5x3", cost: 500.00, hasQuantity: false }
+                    ]
+                },
+                "EXTRA": {
+                    isUnique: false,
+                    items: [
+                        { id: 'item8', name: "Ballerine", cost: 100.00, hasQuantity: true },
+                        { id: 'item9', name: "FX - Sparcular", cost: 50.00, hasQuantity: true },
+                        { id: 'item10', name: "FX - Nebbia", cost: 50.00, hasQuantity: true },
+                        { id: 'item11', name: "FX - Geyser", cost: 50.00, hasQuantity: true }
+                    ]
+                }
+            },
+            selectedItems: {
+                "Band": { name: "Band", cost: 900.00, quantity: 1, hasQuantity: false }
+            },
+            contactsData: [
+                { id: 'contact_0', name: 'Giorgio Massi', phone: '3204823399', email: 'giorgiomassi89@gmail.com' }
+            ],
+            selectedContactId: 'contact_0',
+            nextItemId: 12,
+            nextContactId: 1
+        };
+
+
+        // Funzioni di salvataggio e caricamento
+        function saveData() {
+            const data = {
+                categoriesData,
+                selectedItems,
+                contactsData,
+                selectedContactId,
+                nextItemId,
+                nextContactId
+            };
+            localStorage.setItem('preventivoData', JSON.stringify(data));
+        }
+
+        async function loadData() {
+            const data = localStorage.getItem('preventivoData');
+            if (data) {
+                const parsedData = JSON.parse(data);
+                Object.assign(categoriesData, parsedData.categoriesData || {});
+                Object.assign(selectedItems, parsedData.selectedItems || {});
+                Object.assign(contactsData, parsedData.contactsData || []);
+                selectedContactId = parsedData.selectedContactId || null;
+                nextItemId = parsedData.nextItemId || 1;
+                nextContactId = parsedData.nextContactId || 1;
+                console.log('Dati caricati con successo da localStorage.');
+            } else {
+                try {
+                    // Tentativo di caricamento da GitHub
+                    const response = await fetch('https://raw.githubusercontent.com/levelup-partyband/linktree-levelup/master/scripts/preventive.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const defaultData = await response.json();
+                    
+                    Object.assign(categoriesData, defaultData.categoriesData);
+                    Object.assign(selectedItems, defaultData.selectedItems);
+                    Object.assign(contactsData, defaultData.contactsData);
+                    selectedContactId = defaultData.selectedContactId;
+                    nextItemId = defaultData.nextItemId;
+                    nextContactId = defaultData.nextContactId;
+
+                    console.log('Dati caricati con successo da GitHub.');
+                } catch (error) {
+                    console.error('Errore nel caricamento del JSON da GitHub. Utilizzo la configurazione di default integrata.', error);
+                    // Fallback se il caricamento da GitHub fallisce
+                    Object.assign(categoriesData, FALLBACK_CONFIG.categoriesData);
+                    Object.assign(selectedItems, FALLBACK_CONFIG.selectedItems);
+                    Object.assign(contactsData, FALLBACK_CONFIG.contactsData);
+                    selectedContactId = FALLBACK_CONFIG.selectedContactId;
+                    nextItemId = FALLBACK_CONFIG.nextItemId;
+                    nextContactId = FALLBACK_CONFIG.nextContactId;
+                }
+            }
+        }
+
+        function formatCurrency(amount) {
+            return `€ ${parseFloat(amount).toFixed(2).replace('.', ',')}`;
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            for (const key in selectedItems) {
+                if (selectedItems.hasOwnProperty(key)) {
+                    total += selectedItems[key].cost * selectedItems[key].quantity;
+                }
+            }
+            const discount = parseFloat(discountInput.value) || 0;
+            const finalTotal = total - discount;
+            totalCostElement.textContent = formatCurrency(finalTotal);
+            saveData();
+        }
+
+        // Funzioni per la sezione Contatti
+        function renderContacts() {
+            contactsList.innerHTML = '';
+            if (editingContacts) {
+                contactsData.forEach((contact, index) => {
+                    const contactDiv = document.createElement('div');
+                    contactDiv.className = 'flex items-center space-x-2';
+                    contactDiv.innerHTML = `
+                        <input type="text" value="${contact.name}" placeholder="Nome" class="w-1/3 p-1 rounded-md border text-sm main-container contact-input" data-field="name" data-id="${contact.id}">
+                        <input type="text" value="${contact.phone || ''}" placeholder="Telefono" class="w-1/3 p-1 rounded-md border text-sm main-container contact-input" data-field="phone" data-id="${contact.id}">
+                        <input type="email" value="${contact.email || ''}" placeholder="Email" class="w-1/3 p-1 rounded-md border text-sm main-container contact-input" data-field="email" data-id="${contact.id}">
+                        <button onclick="deleteContact('${contact.id}')" class="text-red-500 hover:text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            </svg>
+                        </button>
+                    `;
+                    contactsList.appendChild(contactDiv);
+                });
+                const addButton = document.createElement('button');
+                addButton.textContent = 'Aggiungi Contatto';
+                addButton.className = 'mt-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors';
+                addButton.onclick = addContact;
+                contactsList.appendChild(addButton);
+
+            } else {
+                const selectDiv = document.createElement('div');
+                selectDiv.className = 'flex items-center space-x-2';
+                const label = document.createElement('span');
+                label.textContent = 'Seleziona Contatto:';
+                label.className = 'text-sm font-semibold';
+                const select = document.createElement('select');
+                select.id = 'contact-select';
+                select.className = 'w-full p-2 rounded-md border text-sm main-container';
+                select.addEventListener('change', (e) => {
+                    selectedContactId = e.target.value;
+                    saveData();
+                });
+                
+                contactsData.forEach(contact => {
+                    const option = document.createElement('option');
+                    option.value = contact.id;
+                    option.textContent = contact.name;
+                    select.appendChild(option);
+                });
+                
+                select.value = selectedContactId;
+                selectDiv.appendChild(label);
+                selectDiv.appendChild(select);
+                contactsList.appendChild(selectDiv);
+            }
+        }
+
+        function toggleContactsEditMode() {
+            editingContacts = !editingContacts;
+            contactsEditIcon.innerHTML = editingContacts ?
+                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />` :
+                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l-6.828 6.828a1 1 0 00-.293.707v3h3a1 1 0 00.707-.293l6.828-6.828m-4.89-4.89a2 2 0 112.828 2.828L15.232 5.232z" />`;
+            renderContacts();
+            saveData();
+        }
+
+        function addContact() {
+            const newContact = {
+                id: `contact_${nextContactId++}`,
+                name: 'Nuovo Contatto',
+                phone: '',
+                email: ''
+            };
+            contactsData.push(newContact);
+            renderContacts();
+            saveData();
+        }
+
+        function deleteContact(id) {
+            contactsData = contactsData.filter(contact => contact.id !== id);
+            if (selectedContactId === id) {
+                selectedContactId = contactsData.length > 0 ? contactsData[0].id : null;
+            }
+            renderContacts();
+            saveData();
+        }
+
+        // Funzioni esistenti
+        function renderBandCard() {
+            bandCardElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-gray-800 dark:text-gray-200">Band</span>
+                        ${editingBand ? 
+                            `<input type="number" id="band-cost-input" value="${selectedItems["Band"].cost}" class="w-32 p-1 text-sm rounded-md border text-gray-800 dark:text-gray-200 mt-1 main-container" />` :
+                            `<span id="band-cost-display" class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(selectedItems["Band"].cost)}</span>`
+                        }
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-400 font-bold text-lg">INCLUSO</span>
+                        <button onclick="toggleBandEditMode()" class="transition-colors edit-button">
+                            ${editingBand ?
+                                `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>` :
+                                `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l-6.828 6.828a1 1 0 00-.293.707v3h3a1 1 0 00.707-.293l6.828-6.828m-4.89-4.89a2 2 0 112.828 2.828L15.232 5.232z" />
+                                </svg>`
+                            }
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (editingBand) {
+                const bandCostInput = document.getElementById('band-cost-input');
+                bandCostInput.focus();
+                bandCostInput.addEventListener('change', (e) => {
+                    selectedItems["Band"].cost = parseFloat(e.target.value);
+                    calculateTotal();
+                });
+            }
+        }
+
+
+        function renderCategories() {
+            categoriesContainer.innerHTML = '';
+            for (const categoryKey in categoriesData) {
+                if (categoriesData.hasOwnProperty(categoryKey)) {
+                    const category = categoriesData[categoryKey];
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = `p-4 rounded-md border shadow-sm section-card`;
+                    
+                    const header = document.createElement('h2');
+                    header.className = `text-2xl font-bold mb-4 tracking-wide flex items-center justify-between section-title`;
+                    
+                    if (editingSection === categoryKey) {
+                        const titleEditContainer = document.createElement('div');
+                        titleEditContainer.className = 'flex flex-col';
+                        const inputTitle = document.createElement('input');
+                        inputTitle.type = 'text';
+                        inputTitle.value = categoryKey;
+                        inputTitle.className = 'w-1/2 p-1 text-xl font-bold rounded-md main-container';
+                        inputTitle.addEventListener('change', (e) => {
+                            const newCategoryKey = e.target.value.toUpperCase().replace(/\s/g, '');
+                            if (newCategoryKey && newCategoryKey !== categoryKey) {
+                                const newCategoriesData = {};
+                                for (const key in categoriesData) {
+                                    if (key === categoryKey) {
+                                        newCategoriesData[newCategoryKey] = categoriesData[key];
+                                    } else {
+                                        newCategoriesData[key] = categoriesData[key];
+                                    }
+                                }
+                                for (const oldKey in categoriesData) {
+                                    delete categoriesData[oldKey];
+                                }
+                                for (const newKey in newCategoriesData) {
+                                    categoriesData[newKey] = newCategoriesData[newKey];
+                                }
+                                editingSection = newCategoryKey;
+                            }
+                            saveData();
+                        });
+                        titleEditContainer.appendChild(inputTitle);
+
+                        const toggleContainer = document.createElement('div');
+                        toggleContainer.className = 'flex items-center text-sm mt-2';
+                        const label = document.createElement('span');
+                        label.textContent = 'UNICO';
+                        label.className = 'mr-2 font-semibold text-sm';
+                        const toggleSwitch = document.createElement('label');
+                        toggleSwitch.className = 'toggle-switch';
+                        const toggleInput = document.createElement('input');
+                        toggleInput.type = 'checkbox';
+                        toggleInput.checked = category.isUnique;
+                        toggleInput.addEventListener('change', (e) => {
+                            category.isUnique = e.target.checked;
+                            if (e.target.checked) {
+                                for (const itemName in selectedItems) {
+                                    const itemExists = category.items.find(i => i.name === itemName);
+                                    if (itemExists) {
+                                        delete selectedItems[itemName];
+                                    }
+                                }
+                            }
+                            renderCategories();
+                            calculateTotal();
+                            saveData();
+                        });
+                        const toggleSlider = document.createElement('span');
+                        toggleSlider.className = 'toggle-slider';
+                        toggleSwitch.appendChild(toggleInput);
+                        toggleSwitch.appendChild(toggleSlider);
+                        toggleContainer.appendChild(label);
+                        toggleContainer.appendChild(toggleSwitch);
+                        
+                        titleEditContainer.appendChild(toggleContainer);
+                        header.appendChild(titleEditContainer);
+
+                    } else {
+                        header.textContent = categoryKey;
+                    }
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.id = `edit-${categoryKey.toLowerCase()}-btn`;
+                    editBtn.className = `transition-colors edit-button`;
+                    editBtn.innerHTML = editingSection === categoryKey ? `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>` : `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l-6.828 6.828a1 1 0 00-.293.707v3h3a1 1 0 00.707-.293l6.828-6.828m-4.89-4.89a2 2 0 112.828 2.828L15.232 5.232z" />
+                        </svg>`;
+                    editBtn.addEventListener('click', () => toggleEditMode(categoryKey));
+                    header.appendChild(editBtn);
+                    
+                    const itemListDiv = document.createElement('div');
+                    itemListDiv.className = 'space-y-3';
+                    
+                    category.items.forEach((item, index) => {
+                        const itemContainer = document.createElement('div');
+                        const isSelected = selectedItems.hasOwnProperty(item.name) && selectedItems[item.name].quantity > 0;
+                        itemContainer.className = `flex flex-col p-4 rounded-lg shadow-sm border cursor-pointer item-card ${isSelected ? 'item-selected' : ''} ${editingSection === categoryKey ? 'edit-mode' : ''}`;
+
+                        const topRow = document.createElement('div');
+                        topRow.className = 'flex items-center justify-between mb-2';
+                        
+                        const nameAndCostContainer = document.createElement('div');
+                        nameAndCostContainer.className = 'flex flex-col';
+
+                        if (editingSection === categoryKey) {
+                            const inputName = document.createElement('input');
+                            inputName.type = 'text';
+                            inputName.value = item.name;
+                            inputName.className = 'font-medium p-1 rounded-md main-container';
+                            inputName.addEventListener('change', (e) => {
+                                const oldName = item.name;
+                                const newName = e.target.value;
+                                if (selectedItems[oldName]) {
+                                    selectedItems[newName] = { ...selectedItems[oldName], name: newName };
+                                    delete selectedItems[oldName];
+                                }
+                                item.name = newName;
+                                renderCategories();
+                                calculateTotal();
+                                saveData();
+                            });
+                            nameAndCostContainer.appendChild(inputName);
+
+                            const inputContainer = document.createElement('div');
+                            inputContainer.className = 'flex items-center space-x-2 text-sm mt-1';
+                            const currencySpan = document.createElement('span');
+                            currencySpan.textContent = '€';
+                            currencySpan.className = 'text-gray-400';
+                            const costInput = document.createElement('input');
+                            costInput.type = 'number';
+                            costInput.value = item.cost;
+                            costInput.className = 'w-24 text-sm px-2 py-1 border rounded-md main-container';
+                            costInput.addEventListener('change', (e) => {
+                                const newCost = parseFloat(e.target.value);
+                                item.cost = newCost;
+                                if (selectedItems[item.name]) {
+                                    selectedItems[item.name].cost = newCost;
+                                }
+                                renderCategories();
+                                calculateTotal();
+                                saveData();
+                            });
+                            inputContainer.appendChild(currencySpan);
+                            inputContainer.appendChild(costInput);
+                            nameAndCostContainer.appendChild(inputContainer);
+                        } else {
+                            const nameElement = document.createElement('span');
+                            nameElement.className = 'font-medium';
+                            nameElement.textContent = item.name;
+                            nameAndCostContainer.appendChild(nameElement);
+
+                            const costElement = document.createElement('span');
+                            costElement.className = 'text-sm text-gray-400';
+                            costElement.textContent = formatCurrency(item.cost);
+                            nameAndCostContainer.appendChild(costElement);
+                        }
+                        
+                        topRow.appendChild(nameAndCostContainer);
+                        
+                        // Delete button
+                        if (editingSection === categoryKey) {
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'delete-button self-start';
+                            deleteBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                                </svg>
+                            `;
+                            deleteBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                deleteItem(categoryKey, index);
+                                saveData();
+                            });
+                            topRow.appendChild(deleteBtn);
+                        } else {
+                             // Quantity buttons for non-unique, quantity-enabled items
+                            if (!category.isUnique && item.hasQuantity) {
+                                const rightContainer = document.createElement('div');
+                                rightContainer.className = 'flex items-center space-x-2';
+                                
+                                const minusBtn = document.createElement('button');
+                                minusBtn.textContent = '-';
+                                minusBtn.className = 'w-8 h-8 rounded-full quantity-button font-bold';
+                                minusBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const currentQuantity = (selectedItems[item.name] && selectedItems[item.name].quantity) || 0;
+                                    if (currentQuantity > 0) {
+                                        selectedItems[item.name].quantity--;
+                                        if (selectedItems[item.name].quantity === 0) {
+                                            delete selectedItems[item.name];
+                                        }
+                                        renderCategories();
+                                        calculateTotal();
+                                        saveData();
+                                    }
+                                });
+
+                                const quantitySpan = document.createElement('span');
+                                quantitySpan.textContent = (selectedItems[item.name] && selectedItems[item.name].quantity) || 0;
+                                quantitySpan.className = 'text-lg w-6 text-center quantity-span';
+
+                                const plusBtn = document.createElement('button');
+                                plusBtn.textContent = '+';
+                                plusBtn.className = 'w-8 h-8 rounded-full quantity-button font-bold';
+                                plusBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const currentQuantity = (selectedItems[item.name] && selectedItems[item.name].quantity) || 0;
+                                    selectedItems[item.name] = { name: item.name, cost: item.cost, quantity: currentQuantity + 1, hasQuantity: true };
+                                    renderCategories();
+                                    calculateTotal();
+                                    saveData();
+                                });
+
+                                rightContainer.appendChild(minusBtn);
+                                rightContainer.appendChild(quantitySpan);
+                                rightContainer.appendChild(plusBtn);
+                                topRow.appendChild(rightContainer);
+                            }
+                        }
+
+                        itemContainer.appendChild(topRow);
+
+                        // Second row for quantity toggle
+                        if (editingSection === categoryKey && !category.isUnique) {
+                            const bottomRow = document.createElement('div');
+                            bottomRow.className = 'flex justify-end items-center text-sm mt-1';
+                            
+                            const label = document.createElement('span');
+                            label.textContent = 'QUANTITÀ';
+                            label.className = 'mr-2 font-semibold text-sm';
+                            const toggleSwitch = document.createElement('label');
+                            toggleSwitch.className = 'toggle-switch';
+                            const toggleInput = document.createElement('input');
+                            toggleInput.type = 'checkbox';
+                            toggleInput.checked = item.hasQuantity;
+                            toggleInput.addEventListener('change', (e) => {
+                                item.hasQuantity = e.target.checked;
+                                if (!item.hasQuantity) {
+                                    if (selectedItems[item.name]) {
+                                        selectedItems[item.name].quantity = 1;
+                                    }
+                                }
+                                renderCategories();
+                                calculateTotal();
+                                saveData();
+                            });
+                            const toggleSlider = document.createElement('span');
+                            toggleSlider.className = 'toggle-slider';
+                            toggleSwitch.appendChild(toggleInput);
+                            toggleSwitch.appendChild(toggleSlider);
+                            bottomRow.appendChild(label);
+                            bottomRow.appendChild(toggleSwitch);
+                            itemContainer.appendChild(bottomRow);
+                        }
+
+                        // Event listener for item selection
+                        if (category.isUnique) {
+                            itemContainer.addEventListener('click', () => {
+                                if (editingSection || editingBand) return;
+                                if (isSelected) {
+                                    delete selectedItems[item.name];
+                                } else {
+                                    category.items.forEach(i => delete selectedItems[i.name]);
+                                    selectedItems[item.name] = { name: item.name, cost: item.cost, quantity: 1, hasQuantity: false };
+                                }
+                                renderCategories();
+                                calculateTotal();
+                                saveData();
+                            });
+                        } else {
+                            if (!item.hasQuantity) {
+                                itemContainer.addEventListener('click', () => {
+                                    if (editingSection || editingBand) return;
+                                    if (isSelected) {
+                                        delete selectedItems[item.name];
+                                    } else {
+                                        selectedItems[item.name] = { name: item.name, cost: item.cost, quantity: 1, hasQuantity: false };
+                                    }
+                                    renderCategories();
+                                    calculateTotal();
+                                    saveData();
+                                });
+                            }
+                        }
+
+                        itemListDiv.appendChild(itemContainer);
+                    });
+                    
+                    // Add new item button if in edit mode
+                    if (editingSection === categoryKey) {
+                        const addItemBtn = document.createElement('button');
+                        addItemBtn.className = `w-full mt-4 py-2 px-4 rounded-lg bg-green-500 text-white font-bold add-button flex items-center justify-center`;
+                        addItemBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4a1 1 0 011 1v6h6a1 1 0 110 2h-6v6a1 1 0 11-2 0v-6H5a1 1 0 110-2h6V5a1 1 0 011-1z" />
+                            </svg>
+                            Aggiungi Voce
+                        `;
+                        addItemBtn.addEventListener('click', () => { addItem(categoryKey); saveData(); });
+                        itemListDiv.appendChild(addItemBtn);
+                    }
+
+                    categoryDiv.appendChild(header);
+                    categoryDiv.appendChild(itemListDiv);
+                    categoriesContainer.appendChild(categoryDiv);
+                }
+            }
+        }
+
+        function addItem(categoryKey) {
+            const newItem = {
+                id: `item${nextItemId++}`,
+                name: "Nuova Voce",
+                cost: 0.00,
+                hasQuantity: false
+            };
+            categoriesData[categoryKey].items.push(newItem);
+            renderCategories();
+            saveData();
+        }
+
+        function deleteItem(categoryKey, itemIndex) {
+            const itemToDelete = categoriesData[categoryKey].items[itemIndex];
+            if (selectedItems.hasOwnProperty(itemToDelete.name)) {
+                delete selectedItems[itemToDelete.name];
+            }
+            categoriesData[categoryKey].items.splice(itemIndex, 1);
+            renderCategories();
+            calculateTotal();
+            saveData();
+        }
+        
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const eventName = document.getElementById('modal-event-name').value;
+            const eventLocation = document.getElementById('modal-event-location').value;
+            const startDate = document.getElementById('modal-event-date-start').value;
+            const endDate = document.getElementById('modal-event-date-end').value;
+            const email = document.getElementById('modal-email').value;
+            
+            const selectedContact = contactsData.find(c => c.id === selectedContactId) || {};
+
+            const today = new Date();
+            const todayFormatted = today.toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const pdfFileName = `preventivo-${todayFormatted.replace(/\//g, '-')}-${eventName.replace(/ /g, '-')}.pdf`;
+            
+            const formattedStartDate = startDate ? new Date(startDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            const formattedEndDate = endDate ? new Date(endDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            let formattedDateText = formattedStartDate;
+            if (formattedEndDate) {
+                formattedDateText = `dal ${formattedStartDate} al ${formattedEndDate}`;
+            }
+
+            const pdfEventNameLocation = document.getElementById('pdf-event-name-location');
+            const pdfEventDate = document.getElementById('pdf-event-date');
+            const pdfEmail = document.getElementById('pdf-email');
+            
+            pdfEventNameLocation.innerHTML = `${eventName}${eventLocation ? `<br>${eventLocation}` : ''}`;
+            pdfEventDate.innerHTML = formattedDateText;
+            pdfEmail.textContent = email;
+
+            document.getElementById('pdf-contact-name').textContent = selectedContact.name || '';
+            document.getElementById('pdf-contact-phone').textContent = selectedContact.phone || '';
+            document.getElementById('pdf-contact-email').textContent = selectedContact.email || '';
+
+            const pdfTableBody = document.getElementById('pdf-table-body');
+            const pdfSubtotalRow = document.getElementById('pdf-subtotal-row');
+            const pdfSubtotal = document.getElementById('pdf-subtotal');
+            const pdfDiscountRow = document.getElementById('pdf-discount-row');
+            const pdfDiscount = document.getElementById('pdf-discount');
+            const pdfTotal = document.getElementById('pdf-total');
+
+            pdfTableBody.innerHTML = '';
+            
+            let subtotalAmount = 0;
+
+            const orderedCategories = Object.keys(categoriesData).map(key => categoriesData[key]);
+            
+            // Ordine fisso per le voci: prima BAND, poi le categorie definite nell'ordine in cui sono state create
+            const allItems = [];
+            if (selectedItems["Band"]) {
+                allItems.push(selectedItems["Band"]);
+            }
+            orderedCategories.forEach(category => {
+                const categoryItems = category.items.filter(item => selectedItems[item.name] && selectedItems[item.name].quantity > 0);
+                allItems.push(...categoryItems.sort((a, b) => a.id.localeCompare(b.id))); // Ordine basato sull'ID
+            });
+
+
+            allItems.forEach(item => {
+                const tr = document.createElement('tr');
+                subtotalAmount += item.cost * item.quantity;
+                
+                let unitCostHtml = '';
+                if (item.hasQuantity) {
+                    unitCostHtml = `<p class="item-cost" style="font-size: 10px; color: #666; text-align: left; padding-left: 10px;">(${formatCurrency(item.cost)})</p>`;
+                }
+                
+                const quantityText = item.hasQuantity ? `${item.quantity}` : '';
+
+                tr.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: baseline;">
+                            <span style="font-size: 14px;">${item.name}</span>
+                            ${unitCostHtml}
+                        </div>
+                    </td>
+                    <td style="text-align: center;">${quantityText}</td>
+                    <td style="text-align: right;">${formatCurrency(item.cost * item.quantity)}</td>
+                `;
+                pdfTableBody.appendChild(tr);
+            });
+
+            const discount = parseFloat(discountInput.value) || 0;
+            if (discount > 0) {
+                pdfSubtotalRow.style.display = 'table-row';
+                pdfSubtotal.textContent = formatCurrency(subtotalAmount);
+                pdfDiscountRow.style.display = 'table-row';
+                pdfDiscount.textContent = `- ${formatCurrency(discount)}`;
+            } else {
+                pdfSubtotalRow.style.display = 'none';
+                pdfDiscountRow.style.display = 'none';
+            }
+
+            pdfTotal.textContent = totalCostElement.textContent;
+
+            const pdfContent = document.getElementById('pdf-content');
+            const logoContainer = document.getElementById('pdf-logo-container');
+            const logoImg = document.getElementById('pdf-logo');
+            
+            let useFallbackText = false;
+            if (!logoImg.complete || logoImg.naturalWidth === 0) {
+                console.warn('Immagine del logo non caricata, utilizzo il testo alternativo.');
+                useFallbackText = true;
+            }
+
+            if (useFallbackText) {
+                logoImg.style.display = 'none';
+                const fallbackDiv = document.createElement('div');
+                fallbackDiv.className = 'text-center';
+                fallbackDiv.innerHTML = `
+                    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; margin: 0; color: #4a0081; line-height: 1;">LEVEL UP</h2>
+                    <p style="font-size: 14px; margin: 0; color: #4a0081;">1990 &rarr; 2000</p>
+                    <p style="font-size: 14px; margin: 0; color: #4a0081;">DISCOTECA DAL VIVO</p>
+                `;
+                logoContainer.appendChild(fallbackDiv);
+            }
+
+
+            pdfContent.style.left = '0';
+            pdfContent.style.top = '0';
+
+            const canvas = await html2canvas(pdfContent, {
+                scale: 2,
+                useCORS: true
+            });
+
+            pdfContent.style.left = '-9999px';
+            pdfContent.style.top = '-9999px';
+
+            if (useFallbackText) {
+                const fallbackDiv = logoContainer.querySelector('div.text-center');
+                if (fallbackDiv) {
+                    fallbackDiv.remove();
+                }
+                logoImg.style.display = 'block';
+            }
+            
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210; 
+            const pageHeight = 297; 
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            doc.save(pdfFileName);
+            
+            hideModal();
+            const button = document.querySelector('button[onclick="showModal()"]');
+            const originalText = button.textContent;
+            button.textContent = 'PREVENTIVO GENERATO!';
+            button.style.backgroundColor = '#22c55e'; // verde
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.backgroundColor = '#ff0099'; // torna al viola
+            }, 2000);
+        }
+
+        function toggleEditMode(categoryKey) {
+            if (editingSection === categoryKey) {
+                editingSection = null;
+            } else {
+                editingSection = categoryKey;
+                editingBand = false;
+                editingContacts = false;
+                renderContacts();
+            }
+            renderCategories();
+            renderBandCard();
+            saveData();
+        }
+
+        function toggleBandEditMode() {
+            editingBand = !editingBand;
+            if (editingBand) {
+                editingSection = null;
+                editingContacts = false;
+                renderContacts();
+            }
+            renderBandCard();
+            renderCategories();
+            calculateTotal();
+            saveData();
+        }
+        
+        function showModal() {
+            pdfModal.style.display = 'flex';
+        }
+
+        function hideModal() {
+            pdfModal.style.display = 'none';
+        }
+
+        pdfForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            generatePDF();
+        });
+        
+        window.onclick = function(event) {
+            if (event.target == pdfModal) {
+                hideModal();
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
+            renderContacts();
+            renderBandCard();
+            renderCategories();
+            calculateTotal();
+
+            contactsList.addEventListener('input', (e) => {
+                if (e.target.classList.contains('contact-input')) {
+                    const id = e.target.dataset.id;
+                    const field = e.target.dataset.field;
+                    const value = e.target.value;
+                    const contact = contactsData.find(c => c.id === id);
+                    if (contact) {
+                        contact[field] = value;
+                        saveData();
+                    }
+                }
+            });
+        });
+
+        // Event listener per l'input sconto
+        discountInput.addEventListener('input', calculateTotal);
+
+    </script>
+</body>
+</html>
