@@ -1,0 +1,104 @@
+{
+    "categoriesData": {
+        "SERVICE": {
+            "isUnique": true,
+            "items": [
+                {
+                    "id": "item1",
+                    "name": "S1 Service",
+                    "cost": 650.00,
+                    "hasQuantity": false
+                },
+                {
+                    "id": "item2",
+                    "name": "S2 Service",
+                    "cost": 800.00,
+                    "hasQuantity": false
+                },
+                {
+                    "id": "item3",
+                    "name": "S3 Service",
+                    "cost": 1100.00,
+                    "hasQuantity": false
+                },
+                {
+                    "id": "item4",
+                    "name": "S4 Service",
+                    "cost": 2000.00,
+                    "hasQuantity": false
+                }
+            ]
+        },
+        "LEDWALL": {
+            "isUnique": true,
+            "items": [
+                {
+                    "id": "item5",
+                    "name": "Ledwall 3x2",
+                    "cost": 300.00,
+                    "hasQuantity": false
+                },
+                {
+                    "id": "item6",
+                    "name": "LedWall 4x2",
+                    "cost": 400.00,
+                    "hasQuantity": false
+                },
+                {
+                    "id": "item7",
+                    "name": "Ledwall 5x3",
+                    "cost": 500.00,
+                    "hasQuantity": false
+                }
+            ]
+        },
+        "EXTRA": {
+            "isUnique": false,
+            "items": [
+                {
+                    "id": "item8",
+                    "name": "Ballerine",
+                    "cost": 100.00,
+                    "hasQuantity": true
+                },
+                {
+                    "id": "item9",
+                    "name": "FX - Sparcular",
+                    "cost": 50.00,
+                    "hasQuantity": true
+                },
+                {
+                    "id": "item10",
+                    "name": "FX - Nebbia",
+                    "cost": 50.00,
+                    "hasQuantity": true
+                },
+                {
+                    "id": "item11",
+                    "name": "FX - Geyser",
+                    "cost": 50.00,
+                    "hasQuantity": true
+                }
+            ]
+        }
+    },
+    "selectedItems": {
+        "Band": {
+            "name": "Band",
+            "cost": 900.00,
+            "quantity": 1,
+            "hasQuantity": false
+        }
+    },
+    "contactsData": [
+        {
+            "id": "contact_0",
+            "name": "Giorgio Massi",
+            "phone": "3204823399",
+            "email": "giorgiomassi89@gmail.com"
+        }
+    ],
+    "selectedContactId": "contact_0",
+    "nextItemId": 12,
+    "nextContactId": 1
+}
