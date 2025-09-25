@@ -11,6 +11,7 @@ let arEventi = [
    { nome: 'Festa Privata - Compleanno', data: '09/08/2025', luogo: 'Spinetoli (AP)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: "Gran Ferragosto", data: '15/08/2025', luogo: "Grottammare (AP)", link: 'https://www.facebook.com/events/664786599737380/', indirizzo: 'Piazza Pericle Fazzini, Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/owku9aeAHm6BPfxD7' },
    { nome: "Memorial", data: '30/08/2025', luogo: "Villa Marchesa, Sant'Edigio (TE)", link: 'https://www.facebook.com/events/2881021962101341/', indirizzo: '', indirizzoLink: '' },
+   { nome: "Festa Privata - Matrimonio", data: '27/09/2025', luogo: "Villa Nicolai - Monteprandone (AP)", link: '', indirizzo: '', indirizzoLink: '' },
 ];
 let arEventi2024 = [
    // { nome: "Festa di Sant'Antonio", data: '15/06/2024', luogo: 'Spelonga (AP)', link: '', indirizzo: '', indirizzoLink: '' },
@@ -21,6 +22,6 @@ let arEventi2024 = [
    { nome: 'Piazzetta e Campari', data: '01/08/2024', luogo: "Sant'Egidio di Monsampolo (AP)", link: 'https://www.facebook.com/events/320271224484642/', indirizzo: "Contrada Sant'Egidio, 45 B, 63077 Monsampolo (AP)", indirizzoLink: 'https://maps.app.goo.gl/sS3irn2B1tdxnTRs8' },
    { nome: 'Festa in Campagna', data: '31/08/2024', luogo: 'Tassanare di Rosora (AN)', link: 'https://www.facebook.com/FestaTassanare', indirizzo: 'Tassanare di Rosora (AN)', indirizzoLink: 'https://maps.app.goo.gl/CpeHn3qmBQVEpsAj8' },
    { nome: 'Maxelâ', data: '06/09/2024', luogo: 'Ascoli Piceno', link: 'https://www.facebook.com/share/Bhg8hdHitSsT958E/', indirizzo: 'Via Tornasacco, 7, 63100 Ascoli Piceno AP', indirizzoLink: 'https://maps.app.goo.gl/tBGiskCGwXKSiWry7' },
-   { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: 'Monteprandone (AP)', link: '', indirizzo: '', indirizzoLink: '' },
+   { nome: 'Festa Privata - Matrimonio', data: '21/09/2024', luogo: 'Villa Nicolai - Monteprandone (AP)', link: '', indirizzo: '', indirizzoLink: '' },
    { nome: 'Capodanno 2025', data: '31/12/2024', luogo: 'Albergo Ristorante Terme - Acquasanta Terme (AP)', link: 'https://www.facebook.com/events/573668735379455/', indirizzo: 'P.za Terme, 20, 63095 Acquasanta Terme (AP)', indirizzoLink: 'https://maps.app.goo.gl/b1e1UpB2zoqSAy7n8' },
 ];
