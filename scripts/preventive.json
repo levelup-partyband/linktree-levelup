@@ -84,7 +84,7 @@
     },
     "selectedItems": {
         "Band": {
-            "name": "Band",
+            "name": "Level Up [band]",
             "cost": 900.00,
             "quantity": 1,
             "hasQuantity": false
@@ -103,3 +103,4 @@
     "nextContactId": 1
 
 }
+
