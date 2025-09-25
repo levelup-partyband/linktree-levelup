@@ -771,7 +771,7 @@
             bandCardElement.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex flex-col">
-                        <h6 class="font-bold text-gray-800 dark:text-gray-200" style="margin:0">${formatCurrency(selectedItems["Band"].name)}</h6>
+                        <h6 class="font-bold text-gray-800 dark:text-gray-200" style="margin:0">${selectedItems["Band"].name}</h6>
                         ${editingBand ? 
                             `<input type="number" id="band-cost-input" value="${selectedItems["Band"].cost}" class="w-32 p-1 text-sm rounded-md border text-gray-800 dark:text-gray-200 mt-1 main-container" />` :
                             `<span id="band-cost-display" class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(selectedItems["Band"].cost)}</span>`
@@ -1378,6 +1378,7 @@
     </script>
 </body>
 </html>
+
 
 
 
