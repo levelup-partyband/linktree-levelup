@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Pro Loco Linker - Giorgio Massi</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gray: { 750: '#2d3748', 850: '#1a202c', 950: '#0d1117' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .alpha-nav {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 4px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+        }
+
+        .dark .alpha-nav {
+            background: rgba(31, 41, 55, 0.9);
+            border: 1px solid #374151;
+        }
+
+        .alpha-nav {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .alpha-nav button {
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Animazione pulsante salvataggio */
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+
+        .saving-pulse {
+            animation: pulse-green 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- TEAM DATA ---
+        const TEAM_MEMBERS = [
+            { id: 'ADB', name: 'Andrea De Blasi' },
+            { id: 'AG', name: 'Andrea Giardina' },
+            { id: 'GM', name: 'Giorgio Massi' },
+            { id: 'PP', name: 'Paulina Pieprzka' },
+            { id: 'SG', name: 'Sergio Grandoni' },
+            { id: 'SP', name: 'Stefano Proietti' }
+        ].sort((a, b) => a.name.localeCompare(b.name));
+
+        const getMemberInitials = (fullName) => {
+            const member = TEAM_MEMBERS.find(m => m.name === fullName);
+            return member ? member.id : 'GM';
+        };
+
+        // --- CONFIGURAZIONE CLOUD BASE (Fallback) ---
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDNmf8uCXooMvnxssluwU-aP3G6S_dXRgE",
+            authDomain: "proloco-contacts.firebaseapp.com",
+            projectId: "proloco-contacts",
+            storageBucket: "proloco-contacts.firebasestorage.app",
+            messagingSenderId: "355702628370",
+            appId: "1:355702628370:web:6b01801ba685be898e38cb"
+        };
+
+        // --- RECUPERO CONFIGURAZIONE (localStorage ha priorità) ---
+        const getFirebaseConfig = () => {
+            const storedKey = localStorage.getItem('proloco_custom_api_key');
+            const config = { ...DEFAULT_FIREBASE_CONFIG };
+            if (storedKey && storedKey.trim() !== "") {
+                config.apiKey = storedKey.trim();
+            }
+            return config;
+        };
+
+        const FIREBASE_CONFIG = getFirebaseConfig();
+
+        const COLLECTION_NAME = 'giorgio_massi_proloco';
+        const DOC_ID = 'proloco_data';
+
+        let db = null;
+        let auth = null;
+        let isFirebaseActive = false;
+
+        // Inizializzazione Firebase
+        if (FIREBASE_CONFIG.apiKey) {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(FIREBASE_CONFIG);
+                } else {
+                    firebase.app(); // Usa l'istanza esistente
+                }
+                db = firebase.firestore();
+                auth = firebase.auth();
+                isFirebaseActive = true;
+                console.log("Firebase Inizializzato con Key:", FIREBASE_CONFIG.apiKey.substring(0, 5) + "...");
+            } catch (e) {
+                console.error("Errore Inizializzazione Firebase:", e);
+            }
+        }
+
+        const DEFAULT_SETTINGS = {
+            colName: 'B', colPres: 'C', colPhone: 'D',
+            colDone: 'H', colFirstDate: 'I',
+            col2ndContact: 'K', col2ndDate: 'L',
+            colNoWa: 'J',
+            colNewName: 'M', colNewRole: 'N', colNewPhone: 'O',
+            colModDone: 'P', colModDate: 'Q', colModNoWa: 'R',
+
+            senderName: 'Giorgio Massi',
+            messageTemplate: `{saluto}, sono {mittente}.
+
+Sto aggiornando i miei contatti associativi e volevo confermare se questo numero è ancora attivo e se parlo con {presidente}, presidente della Pro Loco {proLoco}.
+
+Qualora questo numero non fosse più corretto, potresti gentilmente indicarmi un riferimento valido per l'organizzazione degli eventi?
+
+Ti ringrazio molto per una risposta!`,
+
+            // Messaggio aggiornato (Versione 14)
+            presentationTemplate: `{saluto},
+grazie per il riscontro. Ne approfitto allora per inviarle alcune informazioni sui LEVEL UP Party Band, per valutare se il progetto può essere in linea con la vostra programmazione di eventi.
+
+I LEVEL UP non sono solo una classica cover band, ma una vera discoteca dal vivo che fa rivivere l'energia e i meravigliosi ricordi dei club anni '90 e 2000, con medley no-stop in stile DJ set e tutta la potenza di una vera band live.
+
+Ci proponiamo con un contatto diretto, evitando impresari e costi di intermediazione che spesso gravano inutilmente sul bilancio dell'organizzazione.
+
+A questo link può vedere il nostro video promo e tutti i dettagli: https://www.youtube.com/watch?v=xkx06gYhgnM
+
+Un cordiale saluto,
+{mittente}
+LEVEL UP Party Band`
+        };
+
+        function App() {
+            // --- STATE ---
+            const [fileData, setFileData] = useState(() => {
+                const saved = localStorage.getItem('proloco_db_file');
+                return saved ? JSON.parse(saved) : null;
+            });
+            const [sheetNames, setSheetNames] = useState(() => {
+                const saved = localStorage.getItem('proloco_db_sheets');
+                return saved ? JSON.parse(saved) : [];
+            });
+            const [activeTab, setActiveTab] = useState(() => localStorage.getItem('proloco_db_active_tab') || null);
+
+            const [searchTerm, setSearchTerm] = useState("");
+            const [showSettings, setShowSettings] = useState(false);
+
+            // Stato Cloud
+            const [useCloud, setUseCloud] = useState(() => {
+                const saved = localStorage.getItem('proloco_use_cloud');
+                return saved !== null ? saved === 'true' : true;
+            });
+            const [cloudStatus, setCloudStatus] = useState("disconnected");
+            const [cloudError, setCloudError] = useState(null);
+            const [lastSyncTime, setLastSyncTime] = useState(null);
+            const [isSyncing, setIsSyncing] = useState(false);
+            const [isLoading, setIsLoading] = useState(false);
+
+            // Custom API Key State for Settings
+            const [customApiKey, setCustomApiKey] = useState(localStorage.getItem('proloco_custom_api_key') || DEFAULT_FIREBASE_CONFIG.apiKey);
+
+            // SETTINGS v14
+            const [settings, setSettings] = useState(() => {
+                const saved = localStorage.getItem('proloco_settings_v14');
+                if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+                return DEFAULT_SETTINGS;
+            });
+
+            const [isDarkMode, setIsDarkMode] = useState(() => {
+                const saved = localStorage.getItem('proloco_dark_mode');
+                return saved !== null ? JSON.parse(saved) : true;
+            });
+
+            // Data Storage
+            const [contactHistory, setContactHistory] = useState(() => JSON.parse(localStorage.getItem('proloco_contact_history_v2') || '{}'));
+            const [secondContactHistory, setSecondContactHistory] = useState(() => JSON.parse(localStorage.getItem('proloco_second_contact_history') || '{}'));
+            const [noWhatsappHistory, setNoWhatsappHistory] = useState(() => JSON.parse(localStorage.getItem('proloco_no_whatsapp_history') || '{}'));
+            const [contactUpdates, setContactUpdates] = useState(() => JSON.parse(localStorage.getItem('proloco_contact_updates') || '{}'));
+
+            // --- EFFECTS ---
+            useEffect(() => {
+                if (isDarkMode) {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.add('dark:bg-gray-900');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('dark:bg-gray-900');
+                }
+                localStorage.setItem('proloco_dark_mode', JSON.stringify(isDarkMode));
+            }, [isDarkMode]);
+
+            // GESTIONE CONNESSIONE CLOUD
+            useEffect(() => {
+                localStorage.setItem('proloco_use_cloud', useCloud);
+                if (useCloud) {
+                    setCloudStatus("connecting");
+                    if (isFirebaseActive) {
+                        const doAuth = async () => {
+                            try {
+                                if (!auth.currentUser) {
+                                    await auth.signInAnonymously();
+                                    console.log("Cloud: Autenticato Anonimamente");
+                                }
+                                connectFirestore();
+                            } catch (e) {
+                                console.error("Cloud Auth Error:", e);
+                                if (e.code === 'auth/configuration-not-found' || e.code === 'auth/operation-not-allowed' || e.code === 'auth/api-key-not-valid') {
+                                    console.warn("Cloud Auth non configurato correttamente. Fallback locale.");
+                                    setCloudStatus("disconnected");
+                                    setCloudError("Cloud non attivo (Auth errato o non abilitato)");
+                                    setUseCloud(false);
+                                } else {
+                                    setCloudStatus("error");
+                                    setCloudError("Errore Auth: " + e.code);
+                                }
+                            }
+                        };
+                        doAuth();
+                    } else {
+                        setCloudStatus("error");
+                        setCloudError("Errore Init SDK");
+                    }
+                } else {
+                    setCloudStatus("disconnected");
+                    setCloudError(null);
+                }
+            }, [useCloud]);
+
+            const connectFirestore = () => {
+                if (!db) return;
+                const docRef = db.collection(COLLECTION_NAME).doc(DOC_ID);
+                docRef.onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data) {
+                            if (data.contactHistory) setContactHistory(data.contactHistory);
+                            if (data.secondContactHistory) setSecondContactHistory(data.secondContactHistory);
+                            if (data.noWhatsappHistory) setNoWhatsappHistory(data.noWhatsappHistory);
+                            if (data.contactUpdates) setContactUpdates(data.contactUpdates);
+
+                            setLastSyncTime(new Date());
+                            setCloudStatus("connected");
+                            setCloudError(null);
+                        }
+                    } else {
+                        docRef.set({ contactHistory: {}, secondContactHistory: {}, noWhatsappHistory: {}, contactUpdates: {} });
+                        setCloudStatus("connected");
+                        setCloudError(null);
+                    }
+                }, err => {
+                    console.warn("Firestore Access:", err.message);
+                    setCloudStatus("error");
+                    setCloudError("Permessi DB Insufficienti");
+                });
+            };
+
+            // Local Storage Sync
+            useEffect(() => localStorage.setItem('proloco_contact_history_v2', JSON.stringify(contactHistory)), [contactHistory]);
+            useEffect(() => localStorage.setItem('proloco_second_contact_history', JSON.stringify(secondContactHistory)), [secondContactHistory]);
+            useEffect(() => localStorage.setItem('proloco_no_whatsapp_history', JSON.stringify(noWhatsappHistory)), [noWhatsappHistory]);
+            useEffect(() => localStorage.setItem('proloco_contact_updates', JSON.stringify(contactUpdates)), [contactUpdates]);
+            useEffect(() => localStorage.setItem('proloco_settings_v14', JSON.stringify(settings)), [settings]); // UPDATED VERSION
+            useEffect(() => { if (fileData) localStorage.setItem('proloco_db_file', JSON.stringify(fileData)); else localStorage.removeItem('proloco_db_file'); }, [fileData]);
+            useEffect(() => { if (sheetNames.length) localStorage.setItem('proloco_db_sheets', JSON.stringify(sheetNames)); else localStorage.removeItem('proloco_db_sheets'); }, [sheetNames]);
+            useEffect(() => { if (activeTab) localStorage.setItem('proloco_db_active_tab', activeTab); else localStorage.removeItem('proloco_db_active_tab'); }, [activeTab]);
+
+            // --- FUNCTIONS ---
+            const updateData = (fieldName, data) => {
+                if (useCloud && cloudStatus === "connected" && db && auth.currentUser) {
+                    db.collection(COLLECTION_NAME).doc(DOC_ID).update({ [fieldName]: data })
+                        .catch(e => console.warn("Cloud write failed", e));
+                }
+            };
+
+            const saveCustomApiKey = () => {
+                localStorage.setItem('proloco_custom_api_key', customApiKey.trim());
+                alert("Chiave salvata! La pagina verrà ricaricata.");
+                window.location.reload();
+            };
+
+            const handleFullSync = async (dataToSync = fileData, tabToSync = activeTab) => {
+                if (!dataToSync || !tabToSync) return;
+
+                // Se chiamato da bottone, chiedi conferma. Se da auto-import, procedi.
+                const isAuto = dataToSync !== fileData;
+                if (!isAuto && !confirm("Importare SI/No WA dall'Excel al Cloud?")) return;
+
+                setIsLoading(true);
+                setIsSyncing(true);
+
+                try {
+                    const rows = dataToSync[tabToSync].slice(1);
+                    const newHist1 = { ...contactHistory };
+                    const newHist2 = { ...secondContactHistory };
+                    const newNoWa = { ...noWhatsappHistory };
+                    const newUpdates = { ...contactUpdates };
+                    let countAdded = 0;
+                    const dateNow = new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                    rows.forEach((r, i) => {
+                        const key = getRowKey(tabToSync, r, i);
+                        const modKey = key + "_MOD";
+
+                        const newName = getVal(r, settings.colNewName);
+                        const newRole = getVal(r, settings.colNewRole);
+                        const newPhone = getVal(r, settings.colNewPhone);
+
+                        if ((newName || newRole || newPhone) && !newUpdates[key]) {
+                            newUpdates[key] = { isChanged: true, newName: newName || '', newRole: newRole || '', newPhone: newPhone || '' };
+                            countAdded++;
+                        }
+
+                        const isModified = (newUpdates[key] && newUpdates[key].isChanged);
+                        const targetKey1 = isModified ? modKey : key;
+                        const targetKeyNoWa = isModified ? modKey : key;
+
+                        const colDone = isModified ? getVal(r, settings.colModDone) : getVal(r, settings.colDone);
+                        const colNoWaVal = isModified ? getVal(r, settings.colModNoWa) : getVal(r, settings.colNoWa);
+                        const col2nd = getVal(r, settings.col2ndContact);
+
+                        if (isTrue(colDone)) {
+                            if (!newHist1[targetKey1]) {
+                                newHist1[targetKey1] = `SI (Import) - ${dateNow}`;
+                                countAdded++;
+                            }
+                        }
+                        if (isTrue(col2nd)) {
+                            if (!newHist2[key]) {
+                                newHist2[key] = `SI (Import) - ${dateNow}`;
+                                countAdded++;
+                            }
+                        }
+                        if (isTrue(colNoWaVal)) {
+                            if (!newNoWa[targetKeyNoWa]) {
+                                newNoWa[targetKeyNoWa] = `SI (Import) - ${dateNow}`;
+                                countAdded++;
+                            }
+                        }
+                    });
+
+                    setContactHistory(newHist1);
+                    setSecondContactHistory(newHist2);
+                    setNoWhatsappHistory(newNoWa);
+                    setContactUpdates(newUpdates);
+
+                    if (useCloud && cloudStatus === "connected" && db) {
+                        await db.collection(COLLECTION_NAME).doc(DOC_ID).update({
+                            contactHistory: newHist1, secondContactHistory: newHist2,
+                            noWhatsappHistory: newNoWa, contactUpdates: newUpdates
+                        });
+                        console.log(`Sync completato. ${countAdded} aggiornamenti.`);
+                    }
+
+                    if (!isAuto) {
+                        alert(`Sincronizzazione completata!\n${countAdded} nuovi elementi importati nel Cloud.`);
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Errore durante la sincronizzazione: " + e.message);
+                }
+                finally {
+                    setIsSyncing(false);
+                    setIsLoading(false);
+                }
+            };
+
+            const handleSelectContact = (e, key) => {
+                const selectedInitials = e.target.value;
+                const activeKeyFor1st = key.endsWith("_MOD") ? key : key;
+
+                if (!selectedInitials) {
+                    setContactHistory(prev => {
+                        const n = { ...prev };
+                        delete n[activeKeyFor1st];
+                        updateData('contactHistory', n);
+                        return n;
+                    });
+                } else {
+                    const dateStr = new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    const newVal = `${selectedInitials} - ${dateStr}`;
+                    setContactHistory(prev => {
+                        const n = { ...prev, [activeKeyFor1st]: newVal };
+                        updateData('contactHistory', n);
+                        return n;
+                    });
+                }
+            };
+
+            const toggleBoolean = (setFn, key, fieldName) => {
+                const val = new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                setFn(prev => {
+                    const n = { ...prev };
+                    if (n[key]) delete n[key];
+                    else n[key] = val;
+                    updateData(fieldName, n);
+                    return n;
+                });
+            };
+
+            const updateInfo = (key, field, val) => {
+                setContactUpdates(prev => {
+                    const curr = prev[key] || { isChanged: false, newName: '', newRole: '', newPhone: '' };
+                    const upd = { ...curr, [field]: val };
+                    const hasData = (upd.newName && upd.newName.trim()) || (upd.newRole && upd.newRole.trim()) || (upd.newPhone && upd.newPhone.trim());
+                    upd.isChanged = !!hasData;
+                    const newUpdates = { ...prev, [key]: upd };
+                    if (!upd.isChanged && upd.newName === '' && upd.newRole === '' && upd.newPhone === '') delete newUpdates[key];
+                    updateData('contactUpdates', newUpdates);
+                    return newUpdates;
+                });
+            };
+
+            const handleFile = (file) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    setIsLoading(true);
+                    let parsedData = null;
+                    let parsedSheets = [];
+                    let initialTab = null;
+
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        parsedSheets = workbook.SheetNames;
+                        if (parsedSheets.length === 0) { alert("File vuoto."); return; }
+
+                        parsedData = {};
+                        parsedSheets.forEach(name => {
+                            const ws = workbook.Sheets[name];
+                            parsedData[name] = XLSX.utils.sheet_to_json(ws, { header: "A", defval: "" });
+                        });
+                        initialTab = parsedSheets[0];
+
+                        setFileData(parsedData);
+                        setSheetNames(parsedSheets);
+                        setActiveTab(initialTab);
+                        setSearchTerm("");
+
+                    } catch (err) {
+                        console.error(err);
+                        alert("Errore caricamento file.");
+                    }
+
+                    if (parsedData && initialTab) {
+                        await handleFullSync(parsedData, initialTab);
+                    } else {
+                        setIsLoading(false);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+
+            // --- HELPERS ---
+            const getGreeting = () => {
+                const h = new Date().getHours();
+                if (h >= 5 && h < 13) return "Buongiorno";
+                if (h >= 13 && h < 18) return "Buon pomeriggio";
+                if (h >= 18 && h < 23) return "Buonasera";
+                return "Salve";
+            };
+
+            const parseFlexibleDate = (val) => {
+                if (!val) return "";
+                const s = String(val).trim();
+                const hasTeamSig = TEAM_MEMBERS.some(m => s.startsWith(m.id));
+                if (hasTeamSig) return s;
+                if (isNaN(val) && s.length > 18) return "";
+                if (!isNaN(val) && parseFloat(val) > 10000) {
+                    const d = new Date(1899, 11, 30);
+                    d.setDate(d.getDate() + Math.floor(parseFloat(val)));
+                    const totalSec = Math.round((parseFloat(val) % 1) * 86400);
+                    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(Math.floor(totalSec / 3600)).padStart(2, '0')}:${String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0')}`;
+                }
+                return s;
+            };
+
+            const isTrue = (val) => {
+                if (!val) return false;
+                const s = String(val).trim().toUpperCase();
+                if (['SI', 'S', 'YES', 'Y', 'X', 'OK', 'TRUE', '1', 'VERO'].includes(s)) return true;
+                return TEAM_MEMBERS.some(m => s.includes(m.id));
+            };
+
+            const getVal = (row, col) => {
+                const val = row[col ? col.toUpperCase() : ''];
+                return val != null ? String(val) : "";
+            };
+
+            const getRowKey = (sheet, row, index) => `${sheet}_${getVal(row, settings.colName)}_${getVal(row, settings.colPhone)}_${index}`.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+            const getLink = (item, updates, isNoWa, type) => {
+                if (isNoWa) return { ok: false, url: "#" };
+                const p = cleanPhone((updates?.newPhone && updates.newPhone.trim()) ? updates.newPhone : item.phone);
+                if (!p || p.length < 5) return { ok: false, url: "#" };
+                const name = (updates?.newName && updates.newName.trim()) ? updates.newName : (item.pres || 'Presidente');
+                const tpl = type === 'pres' ? (settings.presentationTemplate || DEFAULT_SETTINGS.presentationTemplate) : (settings.messageTemplate || DEFAULT_SETTINGS.messageTemplate);
+                const msg = tpl.replace(/{saluto}/g, getGreeting()).replace(/{mittente}/g, settings.senderName).replace(/{presidente}/g, name).replace(/{proLoco}/g, item.name || '');
+                return { ok: true, url: `https://wa.me/${p}?text=${encodeURIComponent(msg)}` };
+            };
+
+            const cleanPhone = (p) => {
+                let c = String(p || "").replace(/[^0-9]/g, '');
+                return (c.length > 5 && !c.startsWith('39')) ? '39' + c : c;
+            };
+
+            const logoutAndClear = () => {
+                if (confirm("Uscire e caricare nuovo file?")) {
+                    setFileData(null); setSheetNames([]); setActiveTab(null);
+                    localStorage.removeItem('proloco_db_file'); localStorage.removeItem('proloco_db_sheets'); localStorage.removeItem('proloco_db_active_tab');
+                }
+            };
+
+            const exportData = () => {
+                if (!fileData || !activeTab) return;
+                const rows = fileData[activeTab];
+                const colMap = {
+                    colName: settings.colName, colPres: settings.colPres, colPhone: settings.colPhone,
+                    colDone: settings.colDone, colFirstDate: settings.colFirstDate, col2ndContact: settings.col2ndContact, col2ndDate: settings.col2ndDate, colNoWa: settings.colNoWa,
+                    colNewName: settings.colNewName, colNewRole: settings.colNewRole, colNewPhone: settings.colNewPhone,
+                    colModDone: settings.colModDone, colModDate: settings.colModDate, colModNoWa: settings.colModNoWa,
+                };
+                const idxMap = {};
+                Object.keys(colMap).forEach(key => { if (colMap[key]) idxMap[key] = XLSX.utils.decode_col(colMap[key]); });
+                const aoa = rows.map((r, i) => {
+                    const maxIdx = Math.max(...Object.keys(r).map(k => XLSX.utils.decode_col(k)), ...Object.values(idxMap).filter(v => v >= 0));
+                    const arr = new Array(maxIdx + 1).fill("");
+                    Object.keys(r).forEach(k => {
+                        const idx = XLSX.utils.decode_col(k);
+                        let val = r[k];
+                        if (idxMap.colFirstDate === idx || idxMap.col2ndDate === idx || idxMap.colModDate === idx) {
+                            if (val) val = parseFlexibleDate(val);
+                        }
+                        arr[idx] = val;
+                    });
+                    if (i === 0) {
+                        if (idxMap.colNewName >= 0) arr[idxMap.colNewName] = "Nuovo Nome";
+                        if (idxMap.colNewRole >= 0) arr[idxMap.colNewRole] = "Nuovo Ruolo";
+                        if (idxMap.colNewPhone >= 0) arr[idxMap.colNewPhone] = "Nuovo Tel";
+                        if (idxMap.colModDone >= 0) arr[idxMap.colModDone] = "Contattato 2°";
+                        if (idxMap.colModDate >= 0) arr[idxMap.colModDate] = "Data 1.2";
+                        if (idxMap.colModNoWa >= 0) arr[idxMap.colModNoWa] = "No WApp 2°";
+                        return arr;
+                    }
+                    const key = getRowKey(activeTab, r, i);
+                    const modKey = key + "_MOD";
+                    const upd = contactUpdates[key] || { isChanged: !!((r[colMap.colNewName] && r[colMap.colNewName].trim()) || (r[colMap.colNewRole] && r[colMap.colNewRole].trim()) || (r[colMap.colNewPhone] && r[colMap.colNewPhone].trim())) };
+                    const isModified = upd.isChanged;
+                    const hist1 = contactHistory[key], histMod = contactHistory[modKey], hist2 = secondContactHistory[key], noWaOrig = noWhatsappHistory[key], noWaMod = noWhatsappHistory[modKey];
+
+                    if (idxMap.colDone >= 0) {
+                        if (hist1) arr[idxMap.colDone] = hist1;
+                        else if (isTrue(r[colMap.colDone])) arr[idxMap.colDone] = r[colMap.colDone];
+                    }
+                    if (idxMap.col2ndContact >= 0) {
+                        if (hist2) arr[idxMap.col2ndContact] = hist2;
+                        else if (isTrue(r[colMap.col2ndContact])) arr[idxMap.col2ndContact] = r[colMap.col2ndContact];
+                    }
+                    if (isModified) {
+                        if (idxMap.colModDone >= 0) {
+                            if (histMod) arr[idxMap.colModDone] = histMod;
+                            else if (isTrue(r[colMap.colModDone])) arr[idxMap.colModDone] = r[colMap.colModDone];
+                        }
+                    }
+                    if (idxMap.col2ndDate >= 0) { const exist = parseFlexibleDate(r[colMap.col2ndDate]); if (exist) arr[idxMap.col2ndDate] = exist; }
+                    if (isModified) {
+                        if (idxMap.colModDate >= 0) { const exist = parseFlexibleDate(r[colMap.colModDate]); if (exist) arr[idxMap.colModDate] = exist; }
+                        if (idxMap.colModNoWa >= 0 && (noWaMod || isTrue(r[colMap.colModNoWa]))) arr[idxMap.colModNoWa] = "SI";
+                    } else {
+                        if (idxMap.colFirstDate >= 0) { const exist = parseFlexibleDate(r[colMap.colFirstDate]); if (exist) arr[idxMap.colFirstDate] = exist; }
+                        if (idxMap.colNoWa >= 0 && (noWaOrig || isTrue(r[colMap.colNoWa]))) arr[idxMap.colNoWa] = "SI";
+                    }
+                    if (upd) {
+                        if (idxMap.colNewName >= 0) arr[idxMap.colNewName] = upd.newName || "";
+                        if (idxMap.colNewRole >= 0) arr[idxMap.colNewRole] = upd.newRole || "";
+                        if (idxMap.colNewPhone >= 0) arr[idxMap.colNewPhone] = upd.newPhone || "";
+                    }
+                    return arr;
+                });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "Report");
+                XLSX.writeFile(wb, `Report_Compilato_${activeTab.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+            };
+
+            const listData = useMemo(() => {
+                if (!fileData || !activeTab) return [];
+                const rows = fileData[activeTab].slice(1);
+                const term = searchTerm.toLowerCase();
+                return rows.map((r, i) => ({
+                    raw: r, index: i,
+                    name: getVal(r, settings.colName), pres: getVal(r, settings.colPres), phone: getVal(r, settings.colPhone),
+                    done1: getVal(r, settings.colDone), date1: parseFlexibleDate(getVal(r, settings.colFirstDate)),
+                    done2: getVal(r, settings.col2ndContact), date2: parseFlexibleDate(getVal(r, settings.col2ndDate)),
+                    noWa: getVal(r, settings.colNoWa),
+                    newName: getVal(r, settings.colNewName), newRole: getVal(r, settings.colNewRole), newPhone: getVal(r, settings.colNewPhone),
+                    modDone: getVal(r, settings.colModDone), modDate: parseFlexibleDate(getVal(r, settings.colModDate)), modNoWa: getVal(r, settings.colModNoWa),
+                })).filter(i => (i.name + i.pres + i.phone).toLowerCase().includes(term)).sort((a, b) => a.name.localeCompare(b.name));
+            }, [fileData, activeTab, searchTerm, settings]);
+
+            const alphabet = useMemo(() => [...new Set(listData.map(i => i.name.charAt(0).toUpperCase()))].sort(), [listData]);
+
+            const renderLoaderModal = () => (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl flex flex-col items-center">
+                        <i className="fa-solid fa-cloud-arrow-up fa-spin text-4xl text-purple-600 dark:text-purple-400"></i>
+                        <p className="mt-4 text-lg font-semibold text-gray-800 dark:text-white">{isSyncing ? "Sincronizzazione in corso..." : "Caricamento file..."}</p>
+                    </div>
+                </div>
+            );
+
+            const renderSettingsPanel = () => (
+                <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50 backdrop-blur-sm" onClick={() => setShowSettings(false)}>
+                    <div className="w-96 bg-white dark:bg-gray-800 h-full shadow-2xl p-6 slide-in overflow-y-auto flex flex-col border-l dark:border-gray-700" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Impostazioni</h2>
+                            <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i className="fa-solid fa-times text-xl"></i></button>
+                        </div>
+                        <div className="space-y-6 flex-1 pb-10">
+                            {/* CLOUD CONFIG */}
+                            <div className="border-b border-gray-100 dark:border-gray-700 pb-6">
+                                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">Configurazione Cloud</h3>
+                                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-4 text-xs text-blue-700 dark:text-blue-300">
+                                    Se vedi errori di connessione, incolla qui la tua API Key corretta.
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Key</label>
+                                    <input type="text" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-green-500" value={customApiKey} onChange={(e) => setCustomApiKey(e.target.value)} />
+                                </div>
+                                <button onClick={saveCustomApiKey} className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors">Salva e Ricarica</button>
+                            </div>
+
+                            {/* CLOUD TOGGLE */}
+                            <div className="border-b border-gray-100 dark:border-gray-700 pb-6">
+                                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">Backup & Sync</h3>
+                                <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                            Cloud Sync
+                                            <span className={`w-2 h-2 rounded-full ${cloudStatus === 'connected' ? 'bg-green-500' : cloudStatus === 'connecting' ? 'bg-yellow-500' : cloudStatus === 'error' ? 'bg-red-500' : 'bg-gray-400'}`}></span>
+                                        </span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">{useCloud ? (cloudStatus === 'connected' ? 'Connesso' : cloudStatus === 'error' ? 'Errore' : 'Connessione...') : 'Disabilitato'}</span>
+                                    </div>
+                                    <button onClick={() => setUseCloud(!useCloud)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${useCloud ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${useCloud ? 'translate-x-6' : 'translate-x-1'}`} />
+                                    </button>
+                                </div>
+                                {cloudStatus === 'error' && cloudError && (
+                                    <div className="mt-2 text-xs text-red-500 p-2 bg-red-50 rounded border border-red-100">{cloudError}</div>
+                                )}
+                            </div>
+
+                            {/* TEMA SCURO */}
+                            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-6">
+                                <div><p className="text-sm font-bold text-gray-900 dark:text-white">Tema Scuro</p><p className="text-xs text-gray-500 dark:text-gray-400">Abilita dark mode</p></div>
+                                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isDarkMode ? 'bg-green-500' : 'bg-gray-200'}`}><span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-6' : 'translate-x-1'}`} /></button>
+                            </div>
+
+                            {/* MESSAGGI & MITTENTE */}
+                            <div className="border-b border-gray-100 dark:border-gray-700 pb-6">
+                                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">Messaggi</h3>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mittente</label>
+                                    <div className="relative">
+                                        <select className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg pl-3 pr-8 py-2 text-sm focus:ring-2 focus:ring-green-500 appearance-none" value={settings.senderName} onChange={(e) => setSettings({ ...settings, senderName: e.target.value })}>
+                                            {TEAM_MEMBERS.map(m => (
+                                                <option key={m.id} value={m.name}>{m.name}</option>
+                                            ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300"><i className="fa-solid fa-chevron-down text-xs"></i></div>
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-1 ml-1">Firma automatica: <strong>{getMemberInitials(settings.senderName)}</strong></p>
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">1. Msg Primo Contatto</label>
+                                    <textarea className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 h-24" value={settings.messageTemplate} onChange={(e) => setSettings({ ...settings, messageTemplate: e.target.value })}></textarea>
+                                </div>
+                                <div className="mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">2. Msg Presentazione</label>
+                                    <textarea className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 h-24 border-l-4 border-l-purple-500" value={settings.presentationTemplate} onChange={(e) => setSettings({ ...settings, presentationTemplate: e.target.value })}></textarea>
+                                </div>
+                            </div>
+
+                            {/* MAPPATURA COLONNE */}
+                            <div>
+                                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">Mappatura Colonne</h3>
+                                <div className="space-y-2">
+                                    <h4 className="text-sm font-bold mt-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Dati Base</h4>
+                                    {[
+                                        { id: 'colName', label: 'Denominazione (B)', icon: 'fa-building' },
+                                        { id: 'colPres', label: 'Presidente (C)', icon: 'fa-user' },
+                                        { id: 'colPhone', label: 'Telefono (D)', icon: 'fa-phone' },
+                                    ].map(field => (
+                                        <div key={field.id} className="flex items-center justify-between">
+                                            <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <i className={`fa-solid ${field.icon} text-gray-400 w-4`}></i>
+                                                {field.label}
+                                            </label>
+                                            <input type="text" maxLength="2" className="w-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-center font-bold uppercase focus:ring-2 focus:ring-green-500" value={settings[field.id]} onChange={(e) => setSettings({ ...settings, [field.id]: e.target.value.toUpperCase() })} />
+                                        </div>
+                                    ))}
+
+                                    <h4 className="text-sm font-bold mt-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Stato Originale</h4>
+                                    {[
+                                        { id: 'colDone', label: '1° Contatto (H)', icon: 'fa-check' },
+                                        { id: 'colFirstDate', label: 'Data 1° (I)', icon: 'fa-calendar' },
+                                        { id: 'col2ndContact', label: '2° Contatto (K)', icon: 'fa-check-double' },
+                                        { id: 'col2ndDate', label: 'Data 2° (L)', icon: 'fa-calendar-check' },
+                                        { id: 'colNoWa', label: 'No WhatsApp (J)', icon: 'fa-ban' },
+                                    ].map(field => (
+                                        <div key={field.id} className="flex items-center justify-between">
+                                            <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <i className={`fa-solid ${field.icon} text-gray-400 w-4`}></i>
+                                                {field.label}
+                                            </label>
+                                            <input type="text" maxLength="2" className="w-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-center font-bold uppercase focus:ring-2 focus:ring-green-500" value={settings[field.id]} onChange={(e) => setSettings({ ...settings, [field.id]: e.target.value.toUpperCase() })} />
+                                        </div>
+                                    ))}
+
+                                    <h4 className="text-sm font-bold mt-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Dati Nuovi (Modificati)</h4>
+                                    {[
+                                        { id: 'colNewName', label: 'Nuovo Nome (M)', icon: 'fa-user-pen' },
+                                        { id: 'colNewRole', label: 'Nuovo Ruolo (N)', icon: 'fa-id-card' },
+                                        { id: 'colNewPhone', label: 'Nuovo Tel (O)', icon: 'fa-phone-flip' },
+                                    ].map(field => (
+                                        <div key={field.id} className="flex items-center justify-between">
+                                            <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <i className={`fa-solid ${field.icon} text-gray-400 w-4`}></i>
+                                                {field.label}
+                                            </label>
+                                            <input type="text" maxLength="2" className="w-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-center font-bold uppercase focus:ring-2 focus:ring-amber-500" value={settings[field.id]} onChange={(e) => setSettings({ ...settings, [field.id]: e.target.value.toUpperCase() })} />
+                                        </div>
+                                    ))}
+
+                                    <h4 className="text-sm font-bold mt-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">Stato Post-Modifica</h4>
+                                    {[
+                                        { id: 'colModDone', label: 'Contattato 2° (P)', icon: 'fa-circle-check' },
+                                        { id: 'colModDate', label: 'Data 1.2 (Q)', icon: 'fa-calendar-plus' },
+                                        { id: 'colModNoWa', label: 'No WApp 2° (R)', icon: 'fa-ban' },
+                                    ].map(field => (
+                                        <div key={field.id} className="flex items-center justify-between">
+                                            <label className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <i className={`fa-solid ${field.icon} text-gray-400 w-4`}></i>
+                                                {field.label}
+                                            </label>
+                                            <input type="text" maxLength="2" className="w-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-center font-bold uppercase focus:ring-2 focus:ring-amber-500" value={settings[field.id]} onChange={(e) => setSettings({ ...settings, [field.id]: e.target.value.toUpperCase() })} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button onClick={() => { if (confirm("Ripristinare?")) setSettings(DEFAULT_SETTINGS); }} className="w-full py-3 text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded hover:bg-red-50 transition-colors">Ripristina Default</button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            if (!fileData) return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100 dark:bg-gray-900">
+                    {isLoading && renderLoaderModal()}
+                    {showSettings && renderSettingsPanel()}
+                    <div className="absolute top-4 right-4"><button onClick={() => setShowSettings(true)} className="bg-white dark:bg-gray-800 p-2 rounded-full shadow text-gray-600 dark:text-gray-300 hover:text-green-600 transition-colors"><i className="fa-solid fa-cog text-xl"></i></button></div>
+                    <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+                        <div className="bg-green-600 p-6 text-center"><i className="fa-brands fa-whatsapp text-5xl text-white mb-4"></i><h1 className="text-2xl font-bold text-white">Contatti Pro Loco 17.1</h1><p className="text-green-100 mt-2">Versione Cloud Attivo + Loader</p></div>
+                        <div className="p-8">
+                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-green-400 rounded-lg p-10 text-center cursor-pointer bg-gray-50 dark:bg-gray-850/50" onClick={() => document.getElementById('fileInput').click()}>
+                                <input type="file" id="fileInput" className="hidden" onChange={(e) => e.target.files[0] && handleFile(e.target.files[0])} />
+                                <i className="fa-solid fa-file-excel text-4xl text-gray-400 mb-4"></i><p className="text-gray-600 dark:text-gray-300 font-medium">Carica Excel</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 pb-10 transition-colors duration-300">
+                    {isLoading && renderLoaderModal()}
+                    {showSettings && renderSettingsPanel()}
+                    <header className="bg-white dark:bg-gray-800 shadow-md z-30 sticky top-0 border-b dark:border-gray-700">
+                        <div className="max-w-5xl mx-auto px-4 py-3">
+                            <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3">
+                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                    <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full"><i className="fa-brands fa-whatsapp text-green-600 dark:text-green-400 text-xl"></i></div>
+                                    <h1 className="text-lg font-bold text-gray-800 dark:text-white hidden md:block">Pro Loco</h1>
+                                    <input type="text" placeholder="Cerca..." className="pl-3 py-2 bg-gray-100 dark:bg-gray-700 border-none rounded-full text-sm w-full sm:w-64 focus:ring-2 focus:ring-green-500 outline-none dark:text-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    <button onClick={() => { if (confirm("PULIZIA TOTALE: Cancello memoria locale e ricarico solo il file?")) { localStorage.clear(); location.reload(); } }} className="text-amber-500 p-2 rounded hover:bg-amber-50 dark:hover:bg-amber-900/20" title="Reset Memoria"><i className="fa-solid fa-eraser text-lg"></i></button>
+                                    <button onClick={() => handleFullSync()} disabled={isSyncing || !fileData} className="bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-3 py-2 rounded-lg text-sm font-medium flex gap-2 border border-transparent dark:border-purple-800 disabled:opacity-50">
+                                        {isSyncing ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-cloud-arrow-up"></i>} Sync
+                                    </button>
+                                    <button onClick={() => setShowSettings(true)} className="text-gray-500 dark:text-gray-400 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><i className="fa-solid fa-cog text-lg"></i></button>
+                                    <button onClick={exportData} className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-lg text-sm font-medium flex gap-2 border border-transparent dark:border-blue-800"><i className="fa-solid fa-download"></i> Export</button>
+                                    <button onClick={logoutAndClear} className="text-gray-400 hover:text-red-500 px-2 py-2" title="Esci / Cambia File"><i className="fa-solid fa-right-from-bracket text-lg"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-100 dark:border-gray-700 overflow-x-auto scrollbar-hide bg-white dark:bg-gray-800">
+                            <div className="max-w-5xl mx-auto px-4 flex gap-4">
+                                {sheetNames.map(n => <button key={n} onClick={() => { setActiveTab(n); window.scrollTo({ top: 0 }); }} className={`py-2 text-sm font-medium border-b-2 whitespace-nowrap ${activeTab === n ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 dark:text-gray-400'}`}>{n}</button>)}
+                            </div>
+                        </div>
+                    </header>
+
+                    <nav className="alpha-nav hidden sm:flex border border-transparent dark:border-gray-700/50">
+                        {alphabet.map(c => <button key={c} onClick={() => { const el = document.getElementById(`sec-${c}`); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 140, behavior: 'smooth' }); }} className="text-gray-500 dark:text-gray-400 hover:text-green-600">{c}</button>)}
+                    </nav>
+
+                    <main className="flex-1 p-4 max-w-4xl mx-auto w-full">
+                        {cloudStatus === 'connected' && lastSyncTime && (
+                            <div className="text-center text-xs text-green-600 dark:text-green-400 mb-2">
+                                Sincronizzato col Cloud <i className="fa-solid fa-cloud-check ml-1"></i>
+                            </div>
+                        )}
+                        {cloudStatus === 'error' && (
+                            <div className="text-center text-xs text-red-500 mb-2">
+                                Errore connessione Cloud: {cloudError}
+                            </div>
+                        )}
+                        <div className="space-y-4">
+                            {listData.map((item, i) => {
+                                const key = getRowKey(activeTab, item.raw, i);
+                                const modKey = key + "_MOD";
+
+                                const upd = contactUpdates[key] || {
+                                    isChanged: !!((item.newName && item.newName.trim()) || (item.newRole && item.newRole.trim()) || (item.newPhone && item.newPhone.trim())),
+                                    newName: item.newName || '', newRole: item.newRole || '', newPhone: item.newPhone || ''
+                                };
+                                const isModified = upd.isChanged;
+
+                                let is1st, d1, noWa, activeKeyFor1st, activeKeyForNoWa;
+
+                                if (isModified) {
+                                    is1st = contactHistory[modKey] || (isTrue(item.modDone) ? "SI" : "");
+                                    d1 = contactHistory[modKey] ? contactHistory[modKey].split(' - ')[1] : item.modDate;
+                                    noWa = !!noWhatsappHistory[modKey] || isTrue(item.modNoWa);
+                                    activeKeyFor1st = modKey;
+                                    activeKeyForNoWa = modKey;
+                                } else {
+                                    is1st = contactHistory[key] || (isTrue(item.done1) ? (item.done1 === "SI" ? "SI" : item.done1) : "");
+                                    d1 = contactHistory[key] ? contactHistory[key].split(' - ')[1] : item.date1;
+                                    noWa = !!noWhatsappHistory[key] || isTrue(item.noWa);
+                                    activeKeyFor1st = key;
+                                    activeKeyForNoWa = key;
+                                }
+
+                                const is2nd = !!secondContactHistory[key] || isTrue(item.done2);
+                                const d2 = secondContactHistory[key] || item.date2;
+
+                                const link = getLink(item, upd, noWa, is1st ? 'pres' : 'init');
+                                const char = item.name.charAt(0).toUpperCase();
+                                const showChar = i === 0 || listData[i - 1].name.charAt(0).toUpperCase() !== char;
+
+                                // Determina il valore per la select
+                                let selectValue = "";
+                                if (is1st) {
+                                    if (is1st.includes(' - ')) {
+                                        selectValue = is1st.split(' - ')[0];
+                                    } else if (is1st === "SI") {
+                                        selectValue = "SI";
+                                    } else {
+                                        const found = TEAM_MEMBERS.find(m => is1st.includes(m.id));
+                                        selectValue = found ? found.id : "SI";
+                                    }
+                                }
+
+                                return (
+                                    <div key={`${key}`} id={showChar ? `sec-${char}` : null}>
+                                        {showChar && <div className="sticky top-0 z-0 py-2 mb-2"><span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold px-2 py-1 rounded uppercase shadow-sm">{char}</span></div>}
+                                        <div className={`relative rounded-xl border transition-all overflow-hidden ${is2nd ? 'bg-purple-100 dark:bg-purple-900/40 border-purple-300 dark:border-purple-600' : is1st ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/50' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm'}`}>
+                                            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${is2nd ? 'bg-purple-600' : is1st ? 'bg-green-500' : 'bg-transparent'}`}></div>
+                                            <div className="p-5 pl-6">
+                                                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-lg font-bold truncate mb-1 dark:text-white">{item.name || "Senza Nome"}</h3>
+                                                        <div className="text-gray-600 dark:text-gray-400 text-sm space-y-1">
+                                                            <div className="flex items-center gap-2"><i className="fa-solid fa-user w-4"></i> <span className={upd.isChanged ? 'line-through' : ''}>{item.pres || "---"}</span></div>
+                                                            <div className="flex items-center gap-2"><i className="fa-solid fa-phone w-4"></i> <span className={`font-mono ${upd.isChanged ? 'line-through' : ''}`}>{item.phone || "---"}</span></div>
+                                                        </div>
+                                                        <div className={`mt-3 p-3 rounded-lg border text-sm ${upd.isChanged ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800/50' : 'bg-gray-50 dark:bg-gray-700/30 border-transparent'}`}>
+                                                            <p className={`font-bold text-xs mb-2 uppercase ${upd.isChanged ? 'text-amber-800 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500'}`}>Nuovi Dati</p>
+                                                            <div className="grid grid-cols-1 gap-2">
+                                                                <input type="text" placeholder="Nome" className="border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1.5 text-sm w-full" value={upd.newName} onChange={(e) => updateInfo(key, 'newName', e.target.value)} />
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    <input type="text" placeholder="Ruolo" className="border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1.5 text-sm w-full" value={upd.newRole} onChange={(e) => updateInfo(key, 'newRole', e.target.value)} />
+                                                                    <input type="text" placeholder="Tel" className="border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded px-2 py-1.5 text-sm w-full font-mono" value={upd.newPhone} onChange={(e) => updateInfo(key, 'newPhone', e.target.value)} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2 sm:items-end sm:min-w-[180px]">
+                                                        {link.ok ? (
+                                                            <a href={link.url} target="_blank" rel="noopener noreferrer" className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm transition-colors no-underline ${is1st ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'}`}>
+                                                                <i className="fa-brands fa-whatsapp text-lg"></i> {is1st ? 'Invia Presentazione' : 'Apri Chat'}
+                                                            </a>
+                                                        ) : (
+                                                            <div className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm border border-gray-200 dark:border-gray-600 ${noWa ? 'bg-red-50 dark:bg-red-900/20 text-red-500' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
+                                                                <i className={`fa-solid ${noWa ? 'fa-ban' : 'fa-phone-slash'}`}></i> <span>{noWa ? "Non WhatsApp" : "No Numero"}</span>
+                                                            </div>
+                                                        )}
+
+                                                        {/* SELECT 1° CONTATTO */}
+                                                        <div className="w-full">
+                                                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">1° Contatto</label>
+                                                            <div className="relative">
+                                                                <select className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-xs rounded px-2 py-1.5 appearance-none focus:ring-2 focus:ring-green-500"
+                                                                    value={selectValue}
+                                                                    onChange={(e) => handleSelectContact(e, activeKeyFor1st)}>
+                                                                    <option value="">Da Fare</option>
+                                                                    {TEAM_MEMBERS.map(m => (
+                                                                        <option key={m.id} value={m.id}>{m.id} - {m.name}</option>
+                                                                    ))}
+                                                                    {selectValue === "SI" && <option value="SI">SI (Archivio)</option>}
+                                                                </select>
+                                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500"><i className="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                                            </div>
+                                                        </div>
+
+                                                        {is1st && (
+                                                            <label className="flex items-center justify-between w-full cursor-pointer select-none bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded border border-purple-100 dark:border-purple-800/50 hover:bg-purple-100 dark:hover:bg-purple-900/30">
+                                                                <span className="text-xs font-medium text-purple-700 dark:text-purple-300">2° Contatto</span>
+                                                                <input type="checkbox" checked={is2nd} onChange={() => toggleBoolean(setSecondContactHistory, key, 'secondContactHistory')} className="accent-purple-600 w-4 h-4" />
+                                                            </label>
+                                                        )}
+                                                        <div className="flex gap-2 w-full">
+                                                            <label className="flex-1 flex items-center justify-center gap-1 cursor-pointer select-none bg-gray-50 dark:bg-gray-700/30 px-2 py-1 rounded border border-gray-100 dark:border-gray-700"><span className="text-[10px] text-gray-500">No WA</span><input type="checkbox" checked={noWa} onChange={() => toggleBoolean(setNoWhatsappHistory, activeKeyForNoWa, 'noWhatsappHistory')} className="accent-red-500 w-3 h-3" /></label>
+                                                            <label className="flex-1 flex items-center justify-center gap-1 cursor-pointer select-none bg-gray-50 dark:bg-gray-700/30 px-2 py-1 rounded border border-gray-100 dark:border-gray-700"><span className="text-[10px] text-gray-500">Modif.</span><input type="checkbox" checked={upd.isChanged} onChange={() => toggleBoolean(setContactUpdates, key, 'contactUpdates')} className="accent-amber-500 w-3 h-3" /></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {((is1st && d1) || (is2nd && d2)) && (
+                                                    <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/50 flex flex-col items-end gap-1">
+                                                        {is1st && d1 && <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5"><i className="fa-regular fa-check-circle"></i><span>Primo: <strong>{d1}</strong></span></div>}
+                                                        {is2nd && d2 && <div className="text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1.5"><i className="fa-solid fa-check-double"></i><span>Secondo: <strong>{d2}</strong></span></div>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {!listData.length && <div className="text-center py-12 text-gray-400"><p>Nessun risultato.</p></div>}
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
