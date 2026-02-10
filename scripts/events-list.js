@@ -1,4 +1,8 @@
 let arEventi = [   
+   { nome: "Carnevale 2026", data: "14/02/2026", luogo: "Hotel Casale - Colli del Tronto (AP)", link: "", indirizzo: "Via Casale Superiore, 146, 63079 Colli del Tronto AP", indirizzoLink: "https://maps.app.goo.gl/qXMUcDfbjp4J4Wos5" },
+]
+
+let arEventi2025 = [   
    { nome: "Quel Filo che ci Unisce", data: "02/06/2025", luogo: "Sant'Egidio alla Vibrata (TE)", link: "https://www.facebook.com/events/681740024674212", indirizzo: "Viale Abruzzi, 64016 Sant'Egidio alla Vibrata TE", indirizzoLink: "https://maps.app.goo.gl/8yDfzbYnwmheSMQJ6" },
    { nome: 'Sagra delle Crepes 2025', data: '08/06/2025', luogo: 'Chiesa dei Frati - Ascoli Piceno (AP)', link: 'https://www.facebook.com/events/689821517127706/', indirizzo: 'Via Assisi, 2, 63100 Ascoli Piceno AP', indirizzoLink: 'https://g.co/kgs/nxZtRpD' },
    { nome: 'Festa Privata - Matrimonio', data: '14/06/2025', luogo: 'Marina Palmense (FM)', link: '', indirizzo: '', indirizzoLink: '' },
@@ -12,6 +16,7 @@ let arEventi = [
    { nome: "Gran Ferragosto", data: '15/08/2025', luogo: "Grottammare (AP)", link: 'https://www.facebook.com/events/664786599737380/', indirizzo: 'Piazza Pericle Fazzini, Grottammare AP', indirizzoLink: 'https://maps.app.goo.gl/owku9aeAHm6BPfxD7' },
    { nome: "Memorial", data: '30/08/2025', luogo: "Villa Marchesa, Sant'Edigio (TE)", link: 'https://www.facebook.com/events/2881021962101341/', indirizzo: '', indirizzoLink: '' },
    { nome: "Festa Privata - Matrimonio", data: '27/09/2025', luogo: "Villa Nicolai - Monteprandone (AP)", link: '', indirizzo: '', indirizzoLink: '' },
+   { nome: "Capodanno 2026, data: '31/12/2025', luogo: "Hotel Ristorante - Le Tre Lanterne (AP)", link: '', indirizzo: '', indirizzoLink: '' },
 ];
 let arEventi2024 = [
    // { nome: "Festa di Sant'Antonio", data: '15/06/2024', luogo: 'Spelonga (AP)', link: '', indirizzo: '', indirizzoLink: '' },
