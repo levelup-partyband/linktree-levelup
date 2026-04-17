@@ -1,5 +1,7 @@
 let arEventi = [   
    { nome: "Carnevale 2026", data: "14/02/2026", luogo: "Hotel Casale - Colli del Tronto (AP)", link: "", indirizzo: "Via Casale Superiore, 146, 63079 Colli del Tronto AP", indirizzoLink: "https://maps.app.goo.gl/qXMUcDfbjp4J4Wos5" },
+   { nome: "Controluce Pizzeria", data: "24/04/2026", luogo: "Contrluce Pizzeria - Porto Sant'Elpidio (FM)", link: "", indirizzo: " Piazza Giuseppe Garibaldi, 34, 63821 Porto Sant'Elpidio FM", indirizzoLink: "https://maps.app.goo.gl/xKmiX1xG2CjSPJKa8" },
+   { nome: "Crazy Summer Chalet", data: "12/07/2026", luogo: "Crazy Summer Chalet - Porto Sant'Elpidio (FM)", link: "", indirizzo: "Via Faleria, 110, 63821 Porto Sant'Elpidio FM", indirizzoLink: "https://maps.app.goo.gl/zAigAGm7kzYQJCSU8" },
 ]
 
 let arEventi2025 = [   
