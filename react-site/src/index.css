@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================================
+   BRAND OFFICIAL FONTS — Cocomat Pro + TT Commons (local)
+   ========================================================================= */
+@font-face {
+  font-family: 'Cocomat Pro';
+  src: url('/fonts/CocomatPro-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cocomat Pro';
+  src: url('/fonts/CocomatPro-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cocomat Pro';
+  src: url('/fonts/CocomatPro-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cocomat Pro';
+  src: url('/fonts/CocomatPro-Heavy.otf') format('opentype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Cocomat Pro';
+  src: url('/fonts/CocomatPro-Black.otf') format('opentype');
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TT-Commons-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TT-Commons-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TT-Commons-DemiBold.otf') format('opentype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TT-Commons-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TT-Commons-Black.otf') format('opentype');
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons Expanded';
+  src: url('/fonts/TT-Commons-Pro-Expanded-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TT Commons Expanded';
+  src: url('/fonts/TT-Commons-Pro-Expanded-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+/* =========================================================================
+   BRAND — identità ufficiale (palette + font logo)
+   ========================================================================= */
+:root {
+  --c-bg-base: 13 10 42;           /* #0d0a2a deep navy */
+  --c-bg-soft: 21 16 58;           /* #15103a */
+  --c-accent: 236 18 137;          /* #ec1289 magenta */
+  --c-accent-dark: 179 0 107;
+  --c-accent-2: 93 37 224;         /* purple */
+  --font-display: 'TT Commons Expanded', 'Cocomat Pro', sans-serif;
+  --font-body: 'Cocomat Pro', system-ui, sans-serif;
+  --radius-card: 1.5rem;
+  --bg-image:
+    radial-gradient(60rem 40rem at 80% -10%, rgba(236,18,137,0.22), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 30%, rgba(93,37,224,0.20), transparent 60%);
+  --bg-grid-color: rgba(255,255,255,0.04);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg-image), rgb(var(--c-bg-base));
+    min-height: 100vh;
+    font-family: var(--font-body);
+    color: rgb(255 255 255);
+  }
+  h1, h2, h3 { letter-spacing: 0.01em; }
+}
+
+@layer components {
+  .container-x { @apply max-w-6xl mx-auto px-5 sm:px-8; }
+  .h-display { font-family: var(--font-display); font-weight: 700; @apply tracking-wide uppercase; letter-spacing: 0.02em; }
+  .accent-line { @apply inline-block w-12 h-[3px] bg-brand-pink rounded-full; }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold
+           bg-brand-pink hover:bg-brand-pink-dark text-white transition-colors shadow-glow;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold
+           border border-white/20 hover:border-brand-pink hover:text-brand-pink transition-colors;
+  }
+  .blob {
+    @apply pointer-events-none absolute rounded-full bg-brand-pink -z-10;
+    animation: driftSlow 14s ease-in-out infinite;
+  }
+  .card {
+    border-radius: var(--radius-card);
+    @apply bg-white/[0.03] border border-white/10 backdrop-blur-sm;
+  }
+}
+
+.bg-grid {
+  background-image: linear-gradient(var(--bg-grid-color) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--bg-grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@keyframes driftSlow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33%      { transform: translate(20px, -15px) rotate(2deg); }
+  66%      { transform: translate(-15px, 10px) rotate(-2deg); }
+}

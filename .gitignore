@@ -1,0 +1,5 @@
+.claude/
+react-site/node_modules/
+react-site/dist/
+react-site/tsconfig.tsbuildinfo
+react-site/public/assets/img/service/Nuova cartella/
