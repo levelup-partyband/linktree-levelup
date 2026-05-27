@@ -16,7 +16,7 @@ let arEventi = [
     indirizzoLink: "https://maps.app.goo.gl/xKmiX1xG2CjSPJKa8"
   },
   {
-    nome: "Crazy Summer Chalet",
+    nome: "Crazy Summer Chalet - ore 17.00",
     data: "12/07/2026",
     luogo: "Crazy Summer Chalet - Porto Sant'Elpidio (FM)",
     link: "",
