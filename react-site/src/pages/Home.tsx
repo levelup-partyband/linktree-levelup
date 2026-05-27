@@ -121,7 +121,7 @@ export default function Home() {
       <section id="chisiamo" className="container-x py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative aspect-[4/3] card overflow-hidden group">
-            <img src="/assets/img/live/princpale.webp" alt="Level Up live" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <img src={pub('assets/img/live/princpale.webp')} alt="Level Up live" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-navy-deep/80 via-brand-purple/30 to-transparent" />
             <div className="blob w-32 h-32 -bottom-6 -left-6 opacity-60 animate-floaty" style={{ animationDelay: '2.1s' }} />
           </div>
