@@ -59,11 +59,10 @@ export default function Home() {
 
             {/* LOGO — il brand mark ufficiale */}
             <div className="relative w-full max-w-md">
-              <div className="absolute inset-0 -m-8 bg-brand-pink/25 blur-3xl rounded-full" />
               <img
                 src={logoClear}
                 alt="LEVEL UP — Party Band"
-                className="relative w-full drop-shadow-[0_0_50px_rgba(236,18,137,0.45)] cursor-pointer select-none"
+                className="relative w-full cursor-pointer select-none"
                 onClick={handleHeroLogoClick}
                 draggable={false}
               />
