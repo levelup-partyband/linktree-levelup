@@ -22,6 +22,30 @@ let arEventi = [
     link: "",
     indirizzo: "Via Faleria, 110, 63821 Porto Sant'Elpidio FM",
     indirizzoLink: "https://maps.app.goo.gl/zAigAGm7kzYQJCSU8"
+  },
+  {
+    nome: "Milè Bar",
+    data: "08/08/2026",
+    luogo: "Martinsicuro (TE)",
+    link: "",
+    indirizzo: "",
+    indirizzoLink: ""
+  },
+  {
+    nome: "Tutti Malti per Colonnella",
+    data: "13/08/2026",
+    luogo: "Colonnella (TE)",
+    link: "",
+    indirizzo: "",
+    indirizzoLink: ""
+  },
+  {
+    nome: "Festa",
+    data: "19/09/2026",
+    luogo: "Gimigliano (AP)",
+    link: "",
+    indirizzo: "",
+    indirizzoLink: ""
   }
 ];
 
