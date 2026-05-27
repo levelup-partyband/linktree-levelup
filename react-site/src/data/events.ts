@@ -13,7 +13,7 @@ export const eventi2026: Event[] = [
   { nome: 'Crazy Summer Chalet – ore 17:00', data: '12/07/2026', luogo: "Crazy Summer Chalet - Porto Sant'Elpidio (FM)", indirizzo: "Via Faleria, 110, 63821 Porto Sant'Elpidio FM", indirizzoLink: 'https://maps.app.goo.gl/zAigAGm7kzYQJCSU8' },
   { nome: 'Milè Bar', data: '08/08/2026', luogo: 'Milè – Martinsicuro (TE)', link: 'https://www.instagram.com/mile.moltopiudiunbar', indirizzo: 'Lungomare Europa, 34, 64014 Martinsicuro TE', indirizzoLink: 'https://maps.google.com/?q=Lungomare+Europa+34,+Martinsicuro+TE' },
   { nome: 'Tutti Malti per Colonnella', data: '13/08/2026', luogo: 'Piazza del Popolo - Colonnella (TE)', indirizzo: 'Piazza del Popolo, 64010 Colonnella TE', indirizzoLink: 'https://maps.google.com/?q=Piazza+del+Popolo,+64010+Colonnella+TE' },
-  { nome: 'Festa della Madonna Addolorata', data: '19/09/2026', luogo: 'Santuario Madonna Addolorata – Gimigliano, Venarotta (AP)', indirizzo: 'Gimigliano, 63020 Venarotta AP', indirizzoLink: 'https://maps.google.com/?q=Santuario+Madonna+Addolorata,+Gimigliano,+Venarotta+AP' },
+  { nome: 'Festa della Madonna Addolorata', data: '19/09/2026', luogo: 'Santuario Madonna Addolorata – Gimigliano, Venarotta (AP)', indirizzo: 'Piazzale dell\'Addolorata, 28, 63091 Gimigliano AP', indirizzoLink: 'https://maps.google.com/?q=Piazzale+dell\'Addolorata+28+Gimigliano+AP' },
 ];
 
 export const eventi2025: Event[] = [
