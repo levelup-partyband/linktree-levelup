@@ -11,6 +11,7 @@ import logoClear from '../assets/img/logo-levelup-clear.svg';
 import GalleryBento from '../components/GalleryBento';
 import { SocialLinksCards } from '../components/SocialLinks';
 import { CONTACTS } from '../lib/contacts';
+import { pub } from '../lib/publicUrl';
 
 export default function Home() {
   const scrollTo = useScrollToSection();
@@ -33,14 +34,12 @@ export default function Home() {
 
   const handleHeroLogoClick = () => {
     logoClicks.current += 1;
-    console.log(`logo clicks: ${logoClicks.current}/10`);
     if (logoTimer.current) clearTimeout(logoTimer.current);
     if (logoClicks.current >= 10) {
       logoClicks.current = 0;
       navigate('/preventivo');
     } else {
       logoTimer.current = setTimeout(() => {
-        console.log('logo click counter reset');
         logoClicks.current = 0;
       }, 5000);
     }
@@ -205,7 +204,7 @@ export default function Home() {
             <div key={m.name} className="card p-4 text-center hover:border-brand-pink/60 transition-colors group">
               <div className="aspect-[3/4] mb-3 rounded-xl overflow-hidden">
                 <img
-                  src={m.photo.src}
+                  src={pub(m.photo.src)}
                   alt={m.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   style={{ objectPosition: m.photo.pos }}
@@ -248,7 +247,7 @@ export default function Home() {
             <div key={c.code} className="card overflow-hidden">
               <div className="relative aspect-square bg-gradient-to-br from-brand-navy-deep to-brand-navy overflow-hidden">
                 <img
-                  src={`/assets/img/service/${c.image}`}
+                  src={pub(`assets/img/service/${c.image}`)}
                   alt={c.code}
                   className="absolute inset-0 w-full h-full object-cover invert"
                   style={{ objectPosition: '50% 55%' }}

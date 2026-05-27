@@ -4,6 +4,7 @@ import SectionHeading from '../components/SectionHeading';
 import ServiceModal from '../components/ServiceModal';
 import { bandCost, quoteCategories, QuoteCategory, QuoteItem } from '../data/preventivo';
 import logoUrl from '../assets/img/logo-levelup-clear.svg';
+import { pub } from '../lib/publicUrl';
 
 type Selection = Record<string, { item: QuoteItem; qty: number; category: string }>;
 
@@ -72,8 +73,8 @@ export default function Preventivo() {
         });
 
     Promise.all([
-      loadFont('/fonts/CocomatPro-Regular.ttf'),
-      loadFont('/fonts/CocomatPro-Bold.ttf'),
+      loadFont(pub('fonts/CocomatPro-Regular.ttf')),
+      loadFont(pub('fonts/CocomatPro-Bold.ttf')),
     ]).then(([regular, bold]) => {
       fontDataRef.current = { regular, bold };
     }).catch(() => {});
@@ -120,13 +121,18 @@ export default function Preventivo() {
 
     // Register brand font if loaded
     const BF = 'CocomatPro';
+    let useBrand = false;
     if (fontDataRef.current) {
-      doc.addFileToVFS('CocomatPro-Regular.ttf', fontDataRef.current.regular);
-      doc.addFont('CocomatPro-Regular.ttf', BF, 'normal');
-      doc.addFileToVFS('CocomatPro-Bold.ttf', fontDataRef.current.bold);
-      doc.addFont('CocomatPro-Bold.ttf', BF, 'bold');
+      try {
+        doc.addFileToVFS('CocomatPro-Regular.ttf', fontDataRef.current.regular);
+        doc.addFont('CocomatPro-Regular.ttf', BF, 'normal');
+        doc.addFileToVFS('CocomatPro-Bold.ttf', fontDataRef.current.bold);
+        doc.addFont('CocomatPro-Bold.ttf', BF, 'bold');
+        useBrand = true;
+      } catch {
+        // TTF missing unicode cmap — fall back to helvetica
+      }
     }
-    const useBrand = !!fontDataRef.current;
 
     // BRAND COLORS
     const PINK: [number, number, number] = [236, 18, 137];
@@ -428,7 +434,7 @@ export default function Preventivo() {
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-navy-deep to-brand-navy" />
                     {item.image && (
                       <img
-                        src={item.image}
+                        src={pub(item.image)}
                         alt={item.shortName}
                         className="absolute inset-0 w-full h-full object-cover invert"
                         style={{ objectPosition: '50% 55%' }}

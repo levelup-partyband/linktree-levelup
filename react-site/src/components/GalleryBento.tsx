@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
+import { pub } from '../lib/publicUrl';
 
 const IMGS = [
-  '/assets/img/live/live-01.webp',
-  '/assets/img/live/live-02.webp',
-  '/assets/img/live/live-03.webp',
-  '/assets/img/live/live-05.webp',
-  '/assets/img/live/live-06.jpg',
-  '/assets/img/live/live-07.webp',
-  '/assets/img/live/live-08.webp',
-  '/assets/img/live/imgi_6_width_1248.png',
-  '/assets/img/live/imgi_7_width_530.jpg',
-  '/assets/img/live/imgi_7_width_533(1).png',
-  '/assets/img/live/imgi_7_width_800.jpg',
-  '/assets/img/live/imgi_7_width_800.png',
-  '/assets/img/live/imgi_8_width_572.png',
-];
+  'assets/img/live/live-01.webp',
+  'assets/img/live/live-02.webp',
+  'assets/img/live/live-03.webp',
+  'assets/img/live/live-05.webp',
+  'assets/img/live/live-06.jpg',
+  'assets/img/live/live-07.webp',
+  'assets/img/live/live-08.webp',
+  'assets/img/live/imgi_6_width_1248.png',
+  'assets/img/live/imgi_7_width_530.jpg',
+  'assets/img/live/imgi_7_width_533(1).png',
+  'assets/img/live/imgi_7_width_800.jpg',
+  'assets/img/live/imgi_7_width_800.png',
+  'assets/img/live/imgi_8_width_572.png',
+].map(pub);
 
 export default function GalleryBento() {
   const [portrait, setPortrait] = useState<Record<string, boolean>>({});
