@@ -346,7 +346,7 @@ export default function Preventivo() {
     doc.setFont(useBrand ? BF : 'helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...TEXT_DARK);
-    const note = "Il costo della band è indicativo e può variare in base a distanza, durata, periodo dell'anno e necessità specifiche. Contattaci per un preventivo personalizzato e dettagliato.";
+    const note = "Stima orientativa — il totale può variare sia in aumento che in diminuzione in base a distanza, durata e specifiche dell'evento. Eventuali sconti possono essere applicati in sede di accordo definitivo.";
     doc.text(doc.splitTextToSize(note, right - left - 6), left + 3, y + 9);
     y += 20;
 
