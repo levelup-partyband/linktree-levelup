@@ -346,7 +346,7 @@ export default function Preventivo() {
     doc.setFont(useBrand ? BF : 'helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...TEXT_DARK);
-    const note = "Stima orientativa — il totale può variare sia in aumento che in diminuzione in base a distanza, durata e specifiche dell'evento. Eventuali sconti possono essere applicati in sede di accordo definitivo.";
+    const note = "Questo preventivo è una stima di partenza. Il prezzo finale si definisce insieme, in base alle tue esigenze: distanza, durata, periodo e dettagli dell'evento. Contattaci — troviamo la soluzione perfetta per la tua serata!";
     doc.text(doc.splitTextToSize(note, right - left - 6), left + 3, y + 9);
     y += 20;
 
