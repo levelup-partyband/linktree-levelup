@@ -334,22 +334,6 @@ export default function Preventivo() {
     doc.text(fmt(total), right - 4, y + 9.5, { align: 'right' });
     y += 18;
 
-    // ===== NOTE =====
-    doc.setFillColor(255, 244, 250);
-    doc.setDrawColor(...PINK);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(left, y, right - left, 16, 2, 2, 'FD');
-    doc.setFont(useBrand ? BF : 'helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...PINK);
-    doc.text('NOTA', left + 3, y + 5);
-    doc.setFont(useBrand ? BF : 'helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...TEXT_DARK);
-    const note = "Questo preventivo è una stima di partenza. Il prezzo finale si definisce insieme, in base alle tue esigenze: distanza, durata, periodo e dettagli dell'evento. Contattaci — troviamo la soluzione perfetta per la tua serata!";
-    doc.text(doc.splitTextToSize(note, right - left - 6), left + 3, y + 9);
-    y += 20;
-
     // ===== FOOTER =====
     const footY = PAGE_H - 22;
     doc.setDrawColor(220, 220, 230);
