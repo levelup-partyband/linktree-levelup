@@ -37,9 +37,9 @@ export function SocialLinksCards({ waUrl = CONTACTS.whatsapp }: { waUrl?: string
       <a href={waUrl} target="_blank" rel="noopener noreferrer"
         className="group flex items-center gap-3 p-5 rounded-2xl bg-[#25D366]/15 border border-[#25D366]/40 hover:bg-[#25D366]/25 hover:border-[#25D366] transition-all">
         <svg viewBox="0 0 24 24" className="w-7 h-7 fill-[#25D366] shrink-0"><path d={WA_PATH}/></svg>
-        <div>
-          <div className="font-semibold leading-tight">WhatsApp</div>
-          <div className="text-xs text-white/60">Chat diretta</div>
+        <div className="flex flex-col justify-center">
+          <div className="font-semibold leading-none mb-1">WhatsApp</div>
+          <div className="text-xs text-white/60 leading-none">Chat diretta</div>
         </div>
       </a>
 
@@ -55,27 +55,27 @@ export function SocialLinksCards({ waUrl = CONTACTS.whatsapp }: { waUrl?: string
           </defs>
           <path fill="url(#igGradCards)" d={IG_PATH}/>
         </svg>
-        <div>
-          <div className="font-semibold leading-tight">Instagram DM</div>
-          <div className="text-xs text-white/60">@levelup.partyband</div>
+        <div className="flex flex-col justify-center">
+          <div className="font-semibold leading-none mb-1">Instagram DM</div>
+          <div className="text-xs text-white/60 leading-none">@levelup.partyband</div>
         </div>
       </a>
 
       <a href={CONTACTS.messenger} target="_blank" rel="noopener noreferrer"
         className="group flex items-center gap-3 p-5 rounded-2xl bg-[#0084FF]/15 border border-[#0084FF]/40 hover:bg-[#0084FF]/25 hover:border-[#0084FF] transition-all">
         <svg viewBox="0 0 24 24" className="w-7 h-7 fill-[#0084FF] shrink-0"><path d={ME_PATH}/></svg>
-        <div>
-          <div className="font-semibold leading-tight">Messenger</div>
-          <div className="text-xs text-white/60">Chat Facebook</div>
+        <div className="flex flex-col justify-center">
+          <div className="font-semibold leading-none mb-1">Messenger</div>
+          <div className="text-xs text-white/60 leading-none">Chat Facebook</div>
         </div>
       </a>
 
       <a href={CONTACTS.email}
         className="group flex items-center gap-3 p-5 rounded-2xl bg-brand-pink/15 border border-brand-pink/40 hover:bg-brand-pink/25 hover:border-brand-pink transition-all">
         <svg viewBox="0 0 24 24" className="w-7 h-7 fill-brand-pink shrink-0"><path d={ML_PATH}/></svg>
-        <div>
-          <div className="font-semibold leading-tight">Email</div>
-          <div className="text-xs text-white/60 truncate">{CONTACTS.emailAddress}</div>
+        <div className="flex flex-col justify-center">
+          <div className="font-semibold leading-none mb-1">Email</div>
+          <div className="text-xs text-white/60 leading-none truncate">{CONTACTS.emailAddress}</div>
         </div>
       </a>
     </div>
