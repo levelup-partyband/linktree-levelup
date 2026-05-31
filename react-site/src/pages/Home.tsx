@@ -80,6 +80,7 @@ export default function Home() {
 
             <div className="mt-5 flex flex-wrap gap-3 justify-center">
               <a onClick={() => scrollTo('show')} className="btn-primary cursor-pointer">Scopri lo show</a>
+              <a onClick={() => scrollTo('contatti')} className="btn-ghost cursor-pointer">Richiedi disponibilità →</a>
             </div>
           </div>
         </div>
@@ -245,7 +246,7 @@ export default function Home() {
         <div className="blob w-72 h-72 -top-16 -left-20 opacity-45 pointer-events-none animate-floaty" style={{ animationDelay: '1.7s' }} />
         <div className="blob w-48 h-48 bottom-10 right-0 opacity-35 pointer-events-none animate-pulseGlow" style={{ animationDelay: '4.5s' }} />
         <div className="blob w-24 h-24 top-1/2 right-1/4 opacity-20 pointer-events-none animate-wobble" style={{ animationDelay: '0.9s' }} />
-        <SectionHeading kicker="Service" title="Configurazioni palco" sub="Quattro setup, dalla configurazione base alla struttura più spettacolare." />
+        <SectionHeading kicker="Service" title="Configurazioni palco" sub="Quattro allestimenti, dal più essenziale al più imponente: scegli quanto far salire l'asticella." />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {serviceConfigs.map(c => (
             <div key={c.code} className="card overflow-hidden">
