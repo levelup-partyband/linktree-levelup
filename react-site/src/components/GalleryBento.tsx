@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { pub } from '../lib/publicUrl';
 
 const IMGS = [
@@ -12,41 +11,21 @@ const IMGS = [
   'assets/img/live/imgi_7_width_530.jpg', // tastierista — scatto distinto in verticale
 ].map(pub);
 
+// Masonry layout (CSS columns): each photo keeps its natural aspect ratio,
+// portraits stay tall and landscapes stay wide, flowing into balanced columns.
 export default function GalleryBento() {
-  const [portrait, setPortrait] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    const load = (src: string): Promise<[string, boolean]> =>
-      new Promise(resolve => {
-        const img = new Image();
-        img.onload  = () => resolve([src, img.naturalHeight > img.naturalWidth * 1.1]);
-        img.onerror = () => resolve([src, false]);
-        img.src = src;
-      });
-    Promise.all(IMGS.map(load)).then(entries => setPortrait(Object.fromEntries(entries)));
-  }, []);
-
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 auto-rows-[200px] lg:auto-rows-[220px]">
-      {IMGS.map((src, i) => {
-        const isPortrait = portrait[src] ?? false;
-        // First image: always featured 2×2
-        const colSpan = i === 0 ? 'col-span-2 lg:col-span-2' : 'col-span-1 lg:col-span-1';
-        const rowSpan = (i === 0 || isPortrait) ? 'row-span-2' : 'row-span-1';
-        return (
-          <div
-            key={src}
-            className={`${colSpan} ${rowSpan} card overflow-hidden group`}
-          >
-            <img
-              src={src}
-              alt={`Live ${i + 1}`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              loading="lazy"
-            />
-          </div>
-        );
-      })}
+    <div className="columns-2 lg:columns-3 gap-3 [column-fill:_balance]">
+      {IMGS.map((src, i) => (
+        <div key={src} className="mb-3 break-inside-avoid card overflow-hidden group">
+          <img
+            src={src}
+            alt={`Level Up live ${i + 1}`}
+            className="w-full h-auto block group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        </div>
+      ))}
     </div>
   );
 }
