@@ -33,11 +33,6 @@ export default {
           '0%,100%': { opacity: '0.6', transform: 'scale(1)' },
           '50%': { opacity: '0.9', transform: 'scale(1.08)' },
         },
-        driftSlow: {
-          '0%,100%': { transform: 'translate(0,0) rotate(0deg)' },
-          '33%': { transform: 'translate(20px,-15px) rotate(2deg)' },
-          '66%': { transform: 'translate(-15px,10px) rotate(-2deg)' },
-        },
         wobble: {
           '0%,100%': { transform: 'translate(0,0) rotate(0deg) scale(1)' },
           '25%': { transform: 'translate(10px,8px) rotate(-3deg) scale(1.04)' },
@@ -57,7 +52,6 @@ export default {
         floaty: 'floaty 7s ease-in-out infinite',
         floatyAlt: 'floatyAlt 9s ease-in-out infinite',
         pulseGlow: 'pulseGlow 4s ease-in-out infinite',
-        driftSlow: 'driftSlow 14s ease-in-out infinite',
         wobble: 'wobble 11s ease-in-out infinite',
         drift2: 'drift2 16s ease-in-out infinite',
         floatyDeep: 'floatyDeep 8s ease-in-out infinite',

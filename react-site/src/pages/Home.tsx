@@ -12,6 +12,7 @@ import GalleryBento from '../components/GalleryBento';
 import { SocialLinksCards } from '../components/SocialLinks';
 import { CONTACTS } from '../lib/contacts';
 import { pub } from '../lib/publicUrl';
+import HeroNextDate from '../components/HeroNextDate';
 
 export default function Home() {
   const scrollTo = useScrollToSection();
@@ -73,7 +74,11 @@ export default function Home() {
               l'energia dei club anni '90 e 2000 con medley no-stop in stile DJ set e la potenza di una vera band.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3 justify-center">
+            <div className="mt-8 flex justify-center">
+              <HeroNextDate />
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3 justify-center">
               <a onClick={() => scrollTo('show')} className="btn-primary cursor-pointer">Scopri lo show</a>
             </div>
           </div>

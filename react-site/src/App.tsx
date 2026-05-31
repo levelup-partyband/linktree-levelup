@@ -3,6 +3,24 @@ import { useEffect, useState } from 'react';
 import logoClear from './assets/img/logo-levelup-clear.svg';
 import { useScrollToSection } from './hooks/useScrollToSection';
 import { SocialLinksFooter } from './components/SocialLinks';
+import StructuredData from './components/StructuredData';
+
+type NavItem =
+  | { kind: 'route'; to: string; label: string; end?: boolean }
+  | { kind: 'scroll'; id: string; label: string };
+
+const NAV_LINKS: NavItem[] = [
+  { kind: 'route',  to: '/', label: 'Home', end: true },
+  { kind: 'scroll', id: 'video',    label: 'Video' },
+  { kind: 'scroll', id: 'show',     label: 'Show' },
+  { kind: 'scroll', id: 'band',     label: 'Band' },
+  { kind: 'scroll', id: 'scaletta', label: 'Scaletta' },
+  { kind: 'route',  to: '/eventi',    label: 'Eventi' },
+  { kind: 'route',  to: '/materiali', label: 'Materiali' },
+];
+
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? 'text-brand-pink' : 'hover:text-brand-pink transition-colors';
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,21 +37,37 @@ export default function App() {
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  const renderLink = (item: NavItem, mobile = false) => {
+    if (item.kind === 'route') {
+      return (
+        <NavLink
+          key={item.label}
+          to={item.to}
+          end={item.end}
+          onClick={item.to === '/' ? () => window.scrollTo({ top: 0, behavior: 'smooth' }) : undefined}
+          className={mobile ? undefined : navLinkClass}
+        >
+          {item.label}
+        </NavLink>
+      );
+    }
+    return (
+      <a key={item.label} onClick={() => scrollTo(item.id)} className="cursor-pointer hover:text-brand-pink transition-colors">
+        {item.label}
+      </a>
+    );
+  };
+
   return (
     <>
+      <StructuredData />
       <header className={`fixed top-0 inset-x-0 z-50 transition-all ${scrolled ? 'bg-brand-navy-deep/85 backdrop-blur border-b border-white/10' : 'bg-transparent'}`}>
         <div className="container-x flex items-center justify-between h-16">
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center">
             <span className="font-display font-black text-2xl tracking-wider text-white">LEVEL UP</span>
           </Link>
           <nav className="hidden md:flex items-center gap-7 text-sm">
-            <NavLink to="/" end onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={({isActive}) => isActive ? 'text-brand-pink' : 'hover:text-brand-pink transition-colors'}>Home</NavLink>
-            <a onClick={() => scrollTo('video')}    className="cursor-pointer hover:text-brand-pink transition-colors">Video</a>
-            <a onClick={() => scrollTo('show')}     className="cursor-pointer hover:text-brand-pink transition-colors">Show</a>
-            <a onClick={() => scrollTo('band')}     className="cursor-pointer hover:text-brand-pink transition-colors">Band</a>
-            <a onClick={() => scrollTo('scaletta')} className="cursor-pointer hover:text-brand-pink transition-colors">Scaletta</a>
-            <NavLink to="/eventi"    className={({isActive}) => isActive ? 'text-brand-pink' : 'hover:text-brand-pink transition-colors'}>Eventi</NavLink>
-            <NavLink to="/materiali" className={({isActive}) => isActive ? 'text-brand-pink' : 'hover:text-brand-pink transition-colors'}>Materiali</NavLink>
+            {NAV_LINKS.map(item => renderLink(item))}
             <a onClick={() => scrollTo('contatti')} className="btn-primary !py-2 !px-4 text-sm cursor-pointer">Contattaci</a>
           </nav>
           <button className="md:hidden p-2 text-white" onClick={() => setOpen(!open)} aria-label="menu">
@@ -45,13 +79,7 @@ export default function App() {
         {open && (
           <div className="md:hidden bg-brand-navy-deep/95 border-t border-white/10">
             <div className="container-x py-4 flex flex-col gap-3 text-sm">
-              <NavLink to="/" end>Home</NavLink>
-              <a onClick={() => scrollTo('video')}    className="cursor-pointer">Video</a>
-              <a onClick={() => scrollTo('show')}     className="cursor-pointer">Show</a>
-              <a onClick={() => scrollTo('band')}     className="cursor-pointer">Band</a>
-              <a onClick={() => scrollTo('scaletta')} className="cursor-pointer">Scaletta</a>
-              <NavLink to="/eventi">Eventi</NavLink>
-              <NavLink to="/materiali">Materiali</NavLink>
+              {NAV_LINKS.map(item => renderLink(item, true))}
               <a onClick={() => scrollTo('contatti')} className="btn-primary self-start text-sm !py-2 !px-4 cursor-pointer">Contattaci</a>
             </div>
           </div>
