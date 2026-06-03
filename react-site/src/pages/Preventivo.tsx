@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SectionHeading from '../components/SectionHeading';
 import ServiceModal from '../components/ServiceModal';
 import StepHeader from '../components/preventivo/StepHeader';
@@ -7,58 +7,28 @@ import LedwallSelector from '../components/preventivo/LedwallSelector';
 import ExtraSelector from '../components/preventivo/ExtraSelector';
 import QuoteSummary from '../components/preventivo/QuoteSummary';
 import QuoteFormModal from '../components/preventivo/QuoteFormModal';
+import WeddingBrief from '../components/wedding/WeddingBrief';
 import { useQuoteCalculator } from '../hooks/useQuoteCalculator';
+import { usePdfAssets } from '../hooks/usePdfAssets';
 import { buildQuoteRows, buildWhatsAppText, fmt, type EventForm } from '../lib/quote';
 import { generateQuotePdf } from '../lib/preventivoPdf';
-import { pub } from '../lib/publicUrl';
-import logoUrl from '../assets/img/logo-levelup-clear.svg';
 import type { QuoteItem } from '../data/preventivo';
 
 const WHATSAPP_NUMBER = '393204823399';
 
+type Tab = 'preventivo' | 'brief';
+
 export default function Preventivo() {
   const q = useQuoteCalculator();
+  const { logoDataRef, fontDataRef } = usePdfAssets();
+  const [tab, setTab] = useState<Tab>('preventivo');
   const [showModal, setShowModal] = useState(false);
   const [selectedServiceItem, setSelectedServiceItem] = useState<QuoteItem | null>(null);
 
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState<EventForm>({ name: '', location: '', dateStart: todayISO, dateEnd: todayISO, email: '' });
 
-  const logoDataRef = useRef<string | null>(null);
-  const fontDataRef = useRef<{ regular: string; bold: string } | null>(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-
-    // Pre-load logo into a data URL for the PDF header
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width || 300;
-      canvas.height = img.height || 260;
-      canvas.getContext('2d')?.drawImage(img, 0, 0);
-      logoDataRef.current = canvas.toDataURL('image/png');
-    };
-    img.src = logoUrl;
-
-    // Pre-load brand fonts for the PDF (base64)
-    const loadFont = (url: string): Promise<string> =>
-      fetch(url)
-        .then(r => r.arrayBuffer())
-        .then(buf => {
-          let bin = '';
-          new Uint8Array(buf).forEach(b => { bin += String.fromCharCode(b); });
-          return btoa(bin);
-        });
-
-    Promise.all([
-      loadFont(pub('fonts/CocomatPro-Regular.ttf')),
-      loadFont(pub('fonts/CocomatPro-Bold.ttf')),
-    ]).then(([regular, bold]) => {
-      fontDataRef.current = { regular, bold };
-    }).catch(() => {});
-  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const handleGeneratePdf = () => {
     generateQuotePdf({
@@ -83,8 +53,30 @@ export default function Preventivo() {
 
   return (
     <div className="container-x py-12 pb-32 lg:pb-12">
-      <SectionHeading kicker="Online" title="Calcola il tuo preventivo" sub="Seleziona service, ledwall ed extra: il totale si aggiorna in tempo reale. Poi invialo su WhatsApp o scaricalo in PDF." />
+      <SectionHeading
+        kicker="Riservato"
+        title={tab === 'preventivo' ? 'Calcola il tuo preventivo' : 'Brief matrimonio'}
+        sub={tab === 'preventivo'
+          ? 'Seleziona service, ledwall ed extra: il totale si aggiorna in tempo reale. Poi invialo su WhatsApp o scaricalo in PDF.'
+          : 'Raccogli tutte le info durante il meeting con gli sposi e genera il documento PDF da archiviare.'}
+      />
 
+      {/* TAB SWITCHER */}
+      <div className="mt-6 inline-flex rounded-full border border-white/15 bg-white/5 p-1">
+        <button
+          onClick={() => setTab('preventivo')}
+          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${tab === 'preventivo' ? 'bg-brand-pink text-white' : 'text-white/70 hover:text-white'}`}
+        >Preventivo</button>
+        <button
+          onClick={() => setTab('brief')}
+          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${tab === 'brief' ? 'bg-brand-pink text-white' : 'text-white/70 hover:text-white'}`}
+        >Brief Sposi</button>
+      </div>
+
+      {tab === 'brief' && <WeddingBrief fontDataRef={fontDataRef} logoDataRef={logoDataRef} />}
+
+      {tab === 'preventivo' && (
+      <>
       <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 mt-8">
         {/* ===== MAIN CONTENT ===== */}
         <div className="lg:col-span-2 space-y-8">
@@ -185,6 +177,8 @@ export default function Preventivo() {
           onGeneratePdf={handleGeneratePdf}
           onSendWhatsApp={handleSendWhatsApp}
         />
+      )}
+      </>
       )}
     </div>
   );
