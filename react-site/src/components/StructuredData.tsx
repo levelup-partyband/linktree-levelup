@@ -46,7 +46,7 @@ export default function StructuredData() {
       performer: { '@id': SITE + '#band' },
       organizer: { '@id': SITE + '#band' },
       image: IMG,
-      url: SITE + '#/eventi',
+      url: SITE + 'eventi',
     }));
 
     const data = { '@context': 'https://schema.org', '@graph': [band, ...events] };

@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
 import './index.css';
@@ -22,7 +22,7 @@ function RouteFallback() {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route element={<App />}>
           <Route index element={<Home />} />
@@ -31,6 +31,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="materiali" element={<Suspense fallback={<RouteFallback />}><Materiali /></Suspense>} />
         </Route>
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>,
 );
