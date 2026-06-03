@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm, type WBStation } from '../../data/weddingBrief';
 import { generateWeddingBriefPdf } from '../../lib/weddingBriefPdf';
+import { saveBrief, saveDraft, loadDraft, clearDraft, type SavedBrief } from '../../lib/briefStorage';
 import PriceSummary from './PriceSummary';
+import BriefLibrary from './BriefLibrary';
 import type { PdfFonts } from '../../hooks/usePdfAssets';
 
 type Props = {
@@ -12,12 +14,19 @@ type Props = {
 const inputClass = 'mt-1 w-full px-3 py-2 rounded-lg bg-white/5 border border-white/15 focus:border-brand-pink outline-none text-sm';
 
 export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
-  const [form, setForm] = useState<WBForm>(() => emptyWBForm());
+  const [form, setForm] = useState<WBForm>(() => loadDraft() ?? emptyWBForm());
   const [confirmReset, setConfirmReset] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+  const [saveName, setSaveName] = useState('');
+  const [currentId, setCurrentId] = useState<string | null>(null);
   const set = (key: string, value: WBForm[string]) => setForm(f => ({ ...f, [key]: value }));
 
   const handlePdf = () =>
     generateWeddingBriefPdf(form, { fonts: fontDataRef.current, logo: logoDataRef.current });
+
+  // Auto-save the working draft so a refresh never loses progress
+  useEffect(() => { saveDraft(form); }, [form]);
 
   useEffect(() => {
     if (!confirmReset) return;
@@ -25,6 +34,25 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [confirmReset]);
+
+  const defaultName = () => {
+    const names = [form.sposo1 as string, form.sposo2 as string].filter(Boolean).join(' & ');
+    const d = form.dataMatrimonio ? new Date(form.dataMatrimonio as string).toLocaleDateString('it-IT') : '';
+    return [names || 'Brief', d].filter(Boolean).join(' · ');
+  };
+
+  const openSave = () => { setSaveName(saveName || defaultName()); setShowSave(true); };
+  const confirmSave = () => {
+    const b = saveBrief(saveName.trim() || defaultName(), form, currentId ?? undefined);
+    setCurrentId(b.id);
+    setShowSave(false);
+  };
+  const openBrief = (b: SavedBrief) => {
+    setForm(b.form);
+    setCurrentId(b.id);
+    setSaveName(b.name);
+    setShowLibrary(false);
+  };
 
   const renderField = (field: WBField) => {
     const v = form[field.key];
@@ -187,12 +215,18 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
         </section>
       ))}
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end sticky bottom-0 bg-brand-navy-deep/90 backdrop-blur py-4 -mx-1 px-1 rounded-t-xl">
-        <button onClick={() => setConfirmReset(true)} className="btn-ghost justify-center text-sm">Svuota</button>
-        <button onClick={handlePdf} className="btn-primary justify-center">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current shrink-0"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>
-          Genera PDF Brief
-        </button>
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between sticky bottom-0 bg-brand-navy-deep/90 backdrop-blur py-4 -mx-1 px-1 rounded-t-xl">
+        <div className="flex gap-3">
+          <button onClick={() => setShowLibrary(true)} className="btn-ghost justify-center text-sm">📂 Libreria</button>
+          <button onClick={openSave} className="btn-ghost justify-center text-sm">💾 Salva</button>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => setConfirmReset(true)} className="btn-ghost justify-center text-sm">Svuota</button>
+          <button onClick={handlePdf} className="btn-primary justify-center">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current shrink-0"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>
+            Genera PDF Brief
+          </button>
+        </div>
       </div>
 
       {/* RESET CONFIRM DIALOG */}
@@ -207,7 +241,7 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
             <div className="flex gap-3">
               <button onClick={() => setConfirmReset(false)} className="btn-ghost flex-1 justify-center text-sm">Annulla</button>
               <button
-                onClick={() => { setForm(emptyWBForm()); setConfirmReset(false); }}
+                onClick={() => { setForm(emptyWBForm()); setCurrentId(null); setSaveName(''); clearDraft(); setConfirmReset(false); }}
                 className="btn-primary flex-1 justify-center text-sm"
               >
                 Svuota tutto
@@ -215,6 +249,33 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* SAVE DIALOG */}
+      {showSave && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowSave(false)}>
+          <div role="dialog" aria-modal="true" aria-label="Salva brief" className="card max-w-sm w-full p-6 bg-brand-navy" onClick={e => e.stopPropagation()}>
+            <h3 className="font-display text-xl mb-1">{currentId ? 'Aggiorna brief' : 'Salva brief'}</h3>
+            <p className="text-xs text-white/55 mb-4">Salvato in questo browser. Potrai riaprirlo dalla Libreria.</p>
+            <input
+              autoFocus
+              value={saveName}
+              onChange={e => setSaveName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') confirmSave(); }}
+              placeholder="Nome del brief"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/15 focus:border-brand-pink outline-none text-sm"
+            />
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setShowSave(false)} className="btn-ghost flex-1 justify-center text-sm">Annulla</button>
+              <button onClick={confirmSave} className="btn-primary flex-1 justify-center text-sm">{currentId ? 'Aggiorna' : 'Salva'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LIBRARY */}
+      {showLibrary && (
+        <BriefLibrary onClose={() => setShowLibrary(false)} onOpen={openBrief} currentId={currentId} />
       )}
     </div>
   );
