@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm } from '../../data/weddingBrief';
+import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm, type WBStation } from '../../data/weddingBrief';
 import { generateWeddingBriefPdf } from '../../lib/weddingBriefPdf';
 import type { PdfFonts } from '../../hooks/usePdfAssets';
 
@@ -23,6 +23,52 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
 
   const renderField = (field: WBField) => {
     const v = form[field.key];
+
+    if (field.type === 'stations') {
+      const stations = (v as WBStation[]) || [];
+      const update = (i: number, patch: Partial<WBStation>) =>
+        set(field.key, stations.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+      const remove = (i: number) => set(field.key, stations.filter((_, idx) => idx !== i));
+      const add = () => set(field.key, [...stations, { momento: '', strumentazione: '', note: '' }]);
+      return (
+        <div className="space-y-3">
+          {stations.map((st, i) => (
+            <div key={i} className="rounded-xl border border-white/15 bg-white/5 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold tracking-widest text-brand-pink">POSTAZIONE {i + 1}</span>
+                <button type="button" onClick={() => remove(i)} aria-label="Rimuovi postazione" className="text-white/40 hover:text-brand-pink text-xl leading-none">×</button>
+              </div>
+              <input
+                value={st.momento}
+                onChange={e => update(i, { momento: e.target.value })}
+                placeholder="Momento (es. Aperitivo, Taglio torta, Festa principale)"
+                className={inputClass}
+              />
+              <textarea
+                rows={2}
+                value={st.strumentazione}
+                onChange={e => update(i, { strumentazione: e.target.value })}
+                placeholder="Strumentazione (es. 1 cassa, mixer, musica, ciabatta corrente, punto luce)"
+                className={`${inputClass} resize-y`}
+              />
+              <input
+                value={st.note}
+                onChange={e => update(i, { note: e.target.value })}
+                placeholder="Note (es. serve un punto luce? presa vicina?)"
+                className={inputClass}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={add}
+            className="w-full px-4 py-3 rounded-xl border border-dashed border-white/25 text-white/70 hover:border-brand-pink hover:text-brand-pink transition-colors text-sm font-semibold"
+          >
+            + Aggiungi postazione
+          </button>
+        </div>
+      );
+    }
 
     if (field.type === 'checkbox') {
       const on = v === true;

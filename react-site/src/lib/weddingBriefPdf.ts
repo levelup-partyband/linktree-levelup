@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { WB_SECTIONS, formatWBValue, isWBFieldVisible, type WBForm } from '../data/weddingBrief';
+import { WB_SECTIONS, formatWBValue, isWBFieldVisible, type WBForm, type WBStation } from '../data/weddingBrief';
 
 type Assets = { fonts: { regular: string; bold: string } | null; logo: string | null };
 
@@ -76,6 +76,34 @@ export function generateWeddingBriefPdf(form: WBForm, { fonts, logo }: Assets) {
 
     section.fields.forEach(field => {
       if (!isWBFieldVisible(field, form)) return;
+
+      // Repeatable stations: each rendered as a pink sub-title + equipment + note
+      if (field.type === 'stations') {
+        const stations = (form[field.key] as WBStation[]) || [];
+        const sub = (lbl: string, val: string) => {
+          const text = (val || '').trim() || '—';
+          const lab = lbl + ': ';
+          doc.setFont(FONT, 'bold'); doc.setFontSize(8.5);
+          const lw = doc.getTextWidth(lab) + 1;
+          const lines = doc.splitTextToSize(text, contentW - lw - 4);
+          ensure(5);
+          doc.setFont(FONT, 'bold'); doc.setTextColor(...DARK); doc.text(lab, left + 4, y);
+          doc.setFont(FONT, 'normal'); doc.setTextColor(...MUTED); doc.text(lines[0], left + 4 + lw, y);
+          for (let k = 1; k < lines.length; k++) { y += 4.3; ensure(5); doc.text(lines[k], left + 4 + lw, y); }
+          y += 4.7;
+        };
+        stations.forEach((st, i) => {
+          ensure(12);
+          doc.setFont(FONT, 'bold'); doc.setFontSize(8.5); doc.setTextColor(...PINK);
+          doc.text(`Postazione ${i + 1}${st.momento ? ' — ' + st.momento : ''}`, left, y);
+          y += 5;
+          sub('Strumentazione', st.strumentazione);
+          if ((st.note || '').trim()) sub('Note', st.note);
+          y += 1.8;
+        });
+        return;
+      }
+
       const value = formatWBValue(field, form[field.key]);
       const label = field.label + ':';
       const isLong = field.type === 'textarea';

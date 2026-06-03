@@ -4,7 +4,10 @@
 
 export type WBFieldType =
   | 'text' | 'textarea' | 'date' | 'time' | 'number' | 'tel' | 'email'
-  | 'select' | 'checkbox' | 'multi';
+  | 'select' | 'checkbox' | 'multi' | 'stations';
+
+/** A single audio/light setup point during the event. */
+export type WBStation = { momento: string; strumentazione: string; note: string };
 
 export type WBField = {
   key: string;
@@ -18,7 +21,7 @@ export type WBField = {
 
 export type WBSection = { title: string; hint?: string; fields: WBField[] };
 
-export type WBForm = Record<string, string | string[] | boolean>;
+export type WBForm = Record<string, string | string[] | boolean | WBStation[]>;
 
 export const WB_SECTIONS: WBSection[] = [
   {
@@ -45,6 +48,13 @@ export const WB_SECTIONS: WBSection[] = [
       { key: 'limitiAcustici', label: 'Limiti acustici / orario stop musica', type: 'text' },
       { key: 'nInvitati', label: 'Numero invitati (circa)', type: 'number' },
       { key: 'etaOspiti', label: "Fascia d'età prevalente ospiti", type: 'text' },
+    ],
+  },
+  {
+    title: 'Postazioni & strumentazione',
+    hint: 'Aggiungi una postazione per ogni punto del matrimonio (aperitivo, taglio torta, festa principale...) con la strumentazione necessaria.',
+    fields: [
+      { key: 'postazioni', label: 'Postazioni', type: 'stations', full: true },
     ],
   },
   {
@@ -108,11 +118,24 @@ export function isWBFieldVisible(field: WBField, form: WBForm): boolean {
   return form[field.showIf.key] === field.showIf.equals;
 }
 
+/** A helpful starting template of common wedding setup points. */
+export function defaultStations(): WBStation[] {
+  return [
+    { momento: 'Aperitivo', strumentazione: '', note: '' },
+    { momento: 'Taglio torta', strumentazione: '', note: '' },
+    { momento: 'Festa / ballo principale', strumentazione: '', note: '' },
+  ];
+}
+
 /** Build an empty form with the right default per field type. */
 export function emptyWBForm(): WBForm {
   const f: WBForm = {};
   WB_SECTIONS.forEach(s => s.fields.forEach(fl => {
-    f[fl.key] = fl.type === 'multi' ? [] : fl.type === 'checkbox' ? false : '';
+    f[fl.key] =
+      fl.type === 'stations' ? defaultStations()
+      : fl.type === 'multi' ? []
+      : fl.type === 'checkbox' ? false
+      : '';
   }));
   return f;
 }
