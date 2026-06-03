@@ -8,8 +8,10 @@ export default function Eventi() {
     window.scrollTo(0, 0);
   }, []);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const futuri = upcoming([...eventi2026, ...eventi2025]);
-  const passati2025 = eventi2025.filter(e => parseItalianDate(e.data) < new Date()).sort((a,b) => parseItalianDate(b.data).getTime() - parseItalianDate(a.data).getTime());
+  const passati2025 = eventi2025.filter(e => parseItalianDate(e.data) < today).sort((a,b) => parseItalianDate(b.data).getTime() - parseItalianDate(a.data).getTime());
   const passati2024 = [...eventi2024].sort((a,b) => parseItalianDate(b.data).getTime() - parseItalianDate(a.data).getTime());
 
   return (

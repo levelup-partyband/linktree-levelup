@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { EventForm } from '../../lib/quote';
 
 type Props = {
@@ -11,19 +12,28 @@ type Props = {
 const inputClass = 'mt-1 w-full px-3 py-2 rounded-lg bg-white/5 border border-white/15 focus:border-brand-pink outline-none';
 
 export default function QuoteFormModal({ form, setForm, onClose, onGeneratePdf, onSendWhatsApp }: Props) {
+  const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    firstFieldRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="card max-w-md w-full p-6 bg-brand-navy" onClick={e => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-label="Dati evento" className="card max-w-md w-full p-6 bg-brand-navy" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-display text-2xl">Dati evento</h3>
-          <button onClick={onClose} className="text-white/60 hover:text-brand-pink text-2xl leading-none">×</button>
+          <button onClick={onClose} aria-label="Chiudi" className="text-white/60 hover:text-brand-pink text-2xl leading-none">×</button>
         </div>
         <p className="text-xs text-white/50 mb-4">Compila i dati e scegli come inviarci la richiesta.</p>
 
         <div className="space-y-3 text-sm">
           <label className="block">
             <span className="text-white/70">Nome evento</span>
-            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inputClass} placeholder="Es. Sagra di..." />
+            <input ref={firstFieldRef} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inputClass} placeholder="Es. Sagra di..." />
           </label>
           <label className="block">
             <span className="text-white/70">Luogo</span>
