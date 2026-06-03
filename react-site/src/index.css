@@ -96,6 +96,12 @@
   }
 }
 
+/* Native select dropdown: dark options instead of unreadable white-on-white */
+select option {
+  background-color: rgb(var(--c-bg-soft));
+  color: #fff;
+}
+
 .bg-grid {
   background-image: linear-gradient(var(--bg-grid-color) 1px, transparent 1px),
                     linear-gradient(90deg, var(--bg-grid-color) 1px, transparent 1px);

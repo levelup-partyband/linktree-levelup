@@ -13,6 +13,7 @@ export type WBField = {
   options?: string[];     // for select / multi
   placeholder?: string;
   full?: boolean;         // span full width in the form grid
+  showIf?: { key: string; equals: string | boolean }; // conditional visibility
 };
 
 export type WBSection = { title: string; hint?: string; fields: WBField[] };
@@ -66,9 +67,9 @@ export const WB_SECTIONS: WBSection[] = [
     hint: 'Per ogni momento indica il brano desiderato (artista + titolo).',
     fields: [
       { key: 'musicaCerimonia', label: 'La band cura anche la musica della cerimonia', type: 'checkbox', full: true },
-      { key: 'cerimoniaIngresso', label: 'Cerimonia — ingresso sposa', type: 'text', full: true },
-      { key: 'cerimoniaFedi', label: 'Cerimonia — scambio fedi / promesse', type: 'text', full: true },
-      { key: 'cerimoniaUscita', label: 'Cerimonia — uscita sposi', type: 'text', full: true },
+      { key: 'cerimoniaIngresso', label: 'Cerimonia — ingresso sposa', type: 'text', full: true, showIf: { key: 'musicaCerimonia', equals: true } },
+      { key: 'cerimoniaFedi', label: 'Cerimonia — scambio fedi / promesse', type: 'text', full: true, showIf: { key: 'musicaCerimonia', equals: true } },
+      { key: 'cerimoniaUscita', label: 'Cerimonia — uscita sposi', type: 'text', full: true, showIf: { key: 'musicaCerimonia', equals: true } },
       { key: 'ingressoRicevimento', label: 'Ingresso sposi al ricevimento', type: 'text', full: true },
       { key: 'primoBallo', label: 'Primo ballo degli sposi', type: 'text', full: true },
       { key: 'balloGenitori', label: 'Ballo con i genitori', type: 'text', full: true },
@@ -100,6 +101,12 @@ export const WB_SECTIONS: WBSection[] = [
     ],
   },
 ];
+
+/** Whether a field should be shown given the current form state (showIf rule). */
+export function isWBFieldVisible(field: WBField, form: WBForm): boolean {
+  if (!field.showIf) return true;
+  return form[field.showIf.key] === field.showIf.equals;
+}
 
 /** Build an empty form with the right default per field type. */
 export function emptyWBForm(): WBForm {

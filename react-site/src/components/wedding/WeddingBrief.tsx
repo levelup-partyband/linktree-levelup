@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WB_SECTIONS, emptyWBForm, type WBField, type WBForm } from '../../data/weddingBrief';
+import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm } from '../../data/weddingBrief';
 import { generateWeddingBriefPdf } from '../../lib/weddingBriefPdf';
 import type { PdfFonts } from '../../hooks/usePdfAssets';
 
@@ -123,7 +123,7 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
           </div>
           {section.hint && <p className="text-xs text-white/45 -mt-2 mb-4">{section.hint}</p>}
           <div className="grid sm:grid-cols-2 gap-4">
-            {section.fields.map(field => (
+            {section.fields.filter(field => isWBFieldVisible(field, form)).map(field => (
               <div key={field.key} className={field.full || field.type === 'textarea' || field.type === 'multi' ? 'sm:col-span-2' : ''}>
                 {renderField(field)}
               </div>

@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { WB_SECTIONS, formatWBValue, type WBForm } from '../data/weddingBrief';
+import { WB_SECTIONS, formatWBValue, isWBFieldVisible, type WBForm } from '../data/weddingBrief';
 
 type Assets = { fonts: { regular: string; bold: string } | null; logo: string | null };
 
@@ -75,6 +75,7 @@ export function generateWeddingBriefPdf(form: WBForm, { fonts, logo }: Assets) {
     y += 11;
 
     section.fields.forEach(field => {
+      if (!isWBFieldVisible(field, form)) return;
       const value = formatWBValue(field, form[field.key]);
       const label = field.label + ':';
       const isLong = field.type === 'textarea';
