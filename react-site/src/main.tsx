@@ -11,6 +11,7 @@ import './index.css';
 const Eventi = lazy(() => import('./pages/Eventi'));
 const Preventivo = lazy(() => import('./pages/Preventivo'));
 const Materiali = lazy(() => import('./pages/Materiali'));
+const Privacy = lazy(() => import('./pages/Privacy'));
 
 function RouteFallback() {
   return (
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="eventi" element={<Suspense fallback={<RouteFallback />}><Eventi /></Suspense>} />
           <Route path="preventivo" element={<Suspense fallback={<RouteFallback />}><Preventivo /></Suspense>} />
           <Route path="materiali" element={<Suspense fallback={<RouteFallback />}><Materiali /></Suspense>} />
+          <Route path="privacy" element={<Suspense fallback={<RouteFallback />}><Privacy /></Suspense>} />
         </Route>
       </Routes>
     </BrowserRouter>

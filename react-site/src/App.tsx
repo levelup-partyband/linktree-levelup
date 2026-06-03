@@ -101,7 +101,11 @@ export default function App() {
           </div>
           <SocialLinksFooter />
         </div>
-        <div className="container-x pb-6 text-xs text-white/40">© {new Date().getFullYear()} LEVEL UP Party Band</div>
+        <div className="container-x pb-6 text-xs text-white/40 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>© {new Date().getFullYear()} LEVEL UP Party Band</span>
+          <span className="text-white/20">·</span>
+          <Link to="/privacy" className="hover:text-brand-pink transition-colors">Privacy</Link>
+        </div>
       </footer>
     </>
   );
