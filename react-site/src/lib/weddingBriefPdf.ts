@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
-import { WB_SECTIONS, formatWBValue, isWBFieldVisible, type WBForm, type WBStation } from '../data/weddingBrief';
+import { WB_SECTIONS, formatWBValue, isWBFieldVisible, computeWBTotals, wbNum, type WBForm, type WBStation, type WBPricedItem } from '../data/weddingBrief';
+import { fmt } from './quote';
 
 type Assets = { fonts: { regular: string; bold: string } | null; logo: string | null };
 
@@ -76,6 +77,66 @@ export function generateWeddingBriefPdf(form: WBForm, { fonts, logo }: Assets) {
 
     section.fields.forEach(field => {
       if (!isWBFieldVisible(field, form)) return;
+
+      // Price summary: band + stations + extra, included items struck-through
+      if (field.type === 'summary') {
+        const groupLabel = (txt: string) => {
+          ensure(7);
+          doc.setFont(FONT, 'bold'); doc.setFontSize(7); doc.setTextColor(...PINK);
+          doc.text(txt.toUpperCase(), left, y); y += 4.6;
+        };
+        const priceRow = (name: string, prezzo: string, incluso: boolean) => {
+          ensure(6);
+          const label = name + (incluso ? '  ·  incluso' : '');
+          doc.setFont(FONT, 'normal'); doc.setFontSize(9);
+          doc.setTextColor(...(incluso ? MUTED : DARK));
+          doc.text(doc.splitTextToSize(label, contentW - 38)[0], left + 2, y);
+          const amt = fmt(wbNum(prezzo));
+          if (incluso) {
+            doc.setTextColor(...MUTED);
+            doc.text(amt, right, y, { align: 'right' });
+            const w = doc.getTextWidth(amt);
+            doc.setDrawColor(...MUTED); doc.setLineWidth(0.3);
+            doc.line(right - w, y - 1.3, right, y - 1.3);
+          } else {
+            doc.setFont(FONT, 'bold'); doc.setTextColor(...NAVY);
+            doc.text(amt, right, y, { align: 'right' });
+          }
+          y += 5.6;
+        };
+
+        const stations = (form.postazioni as WBStation[]) || [];
+        const extra = (form.extra as WBPricedItem[]) || [];
+
+        groupLabel('Band');
+        priceRow('Band — LEVEL UP', form.bandPrezzo as string, form.bandIncluso as boolean);
+
+        if (stations.length) {
+          groupLabel('Postazioni');
+          stations.forEach((st, i) => priceRow(`Postazione ${i + 1}${st.momento ? ' — ' + st.momento : ''}`, st.prezzo, st.incluso));
+        }
+        if (extra.length) {
+          groupLabel('Extra');
+          extra.forEach(e => priceRow(e.voce || 'Extra', e.prezzo, e.incluso));
+        }
+
+        const t = computeWBTotals(form);
+        y += 1.5;
+        doc.setDrawColor(...PINK); doc.setLineWidth(0.4); doc.line(left, y, right, y); y += 6;
+        doc.setFont(FONT, 'normal'); doc.setFontSize(9); doc.setTextColor(...MUTED);
+        doc.text('Subtotale', left + 2, y); doc.text(fmt(t.subtotal), right, y, { align: 'right' }); y += 5;
+        if (t.sconto > 0) {
+          doc.setTextColor(34, 197, 94);
+          doc.text('Sconto', left + 2, y); doc.text(`- ${fmt(t.sconto)}`, right, y, { align: 'right' }); y += 6;
+        }
+        ensure(16);
+        doc.setFillColor(...PINK); doc.roundedRect(left, y, contentW, 14, 2, 2, 'F');
+        doc.setFont(FONT, 'bold'); doc.setFontSize(11); doc.setTextColor(255, 255, 255);
+        doc.text('TOTALE', left + 4, y + 9);
+        doc.setFontSize(16); doc.text(fmt(t.total), right - 4, y + 9.5, { align: 'right' });
+        y += 18;
+        return;
+      }
 
       // Repeatable stations: each rendered as a pink sub-title + equipment + note
       if (field.type === 'stations') {

@@ -4,10 +4,13 @@
 
 export type WBFieldType =
   | 'text' | 'textarea' | 'date' | 'time' | 'number' | 'tel' | 'email'
-  | 'select' | 'checkbox' | 'multi' | 'stations';
+  | 'select' | 'checkbox' | 'multi' | 'stations' | 'summary';
 
-/** A single audio/light setup point during the event. */
-export type WBStation = { momento: string; strumentazione: string; note: string };
+/** A single audio/light setup point during the event (price set in the summary). */
+export type WBStation = { momento: string; strumentazione: string; note: string; prezzo: string; incluso: boolean };
+
+/** A generic priced line (extra: mic, proiettori, ecc.). */
+export type WBPricedItem = { voce: string; prezzo: string; incluso: boolean };
 
 export type WBField = {
   key: string;
@@ -21,7 +24,7 @@ export type WBField = {
 
 export type WBSection = { title: string; hint?: string; fields: WBField[] };
 
-export type WBForm = Record<string, string | string[] | boolean | WBStation[]>;
+export type WBForm = Record<string, string | string[] | boolean | WBStation[] | WBPricedItem[]>;
 
 export const WB_SECTIONS: WBSection[] = [
   {
@@ -111,6 +114,13 @@ export const WB_SECTIONS: WBSection[] = [
       { key: 'note', label: 'Note libere', type: 'textarea', full: true },
     ],
   },
+  {
+    title: 'Riepilogo & prezzi',
+    hint: 'Assegna un prezzo alle voci. Marca "Incluso" ciò che è compreso nel pacchetto: viene mostrato come valore omaggio (barrato) e non sommato.',
+    fields: [
+      { key: 'riepilogo', label: 'Riepilogo', type: 'summary', full: true },
+    ],
+  },
 ];
 
 /** Whether a field should be shown given the current form state (showIf rule). */
@@ -121,7 +131,7 @@ export function isWBFieldVisible(field: WBField, form: WBForm): boolean {
 
 /** Start with a single empty station; the user adds more as needed. */
 export function defaultStations(): WBStation[] {
-  return [{ momento: '', strumentazione: '', note: '' }];
+  return [{ momento: '', strumentazione: '', note: '', prezzo: '', incluso: false }];
 }
 
 /** Build an empty form with the right default per field type. */
@@ -134,7 +144,32 @@ export function emptyWBForm(): WBForm {
       : fl.type === 'checkbox' ? false
       : '';
   }));
+  // Pricing keys used by the summary (not plain schema fields)
+  f.bandPrezzo = '';
+  f.bandIncluso = false;
+  f.extra = [] as WBPricedItem[];
+  f.sconto = '';
   return f;
+}
+
+/** Parse a price string ("1.200,50" / "1200.5") into a number, 0 if invalid. */
+export const wbNum = (s: unknown): number => {
+  const n = parseFloat(String(s ?? '').replace(/\./g, '').replace(',', '.'));
+  return isNaN(n) ? 0 : n;
+};
+
+export type WBTotals = { band: number; postazioni: number; extra: number; subtotal: number; sconto: number; total: number };
+
+/** Compute the price summary. Items marked "incluso" are not summed. */
+export function computeWBTotals(form: WBForm): WBTotals {
+  const band = form.bandIncluso ? 0 : wbNum(form.bandPrezzo);
+  const postazioni = ((form.postazioni as WBStation[]) || [])
+    .reduce((s, st) => s + (st.incluso ? 0 : wbNum(st.prezzo)), 0);
+  const extra = ((form.extra as WBPricedItem[]) || [])
+    .reduce((s, e) => s + (e.incluso ? 0 : wbNum(e.prezzo)), 0);
+  const subtotal = band + postazioni + extra;
+  const sconto = wbNum(form.sconto);
+  return { band, postazioni, extra, subtotal, sconto, total: Math.max(0, subtotal - sconto) };
 }
 
 /** Human-readable value for PDF / display. Empty → "—". */

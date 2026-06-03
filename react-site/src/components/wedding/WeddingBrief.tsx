@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm, type WBStation } from '../../data/weddingBrief';
 import { generateWeddingBriefPdf } from '../../lib/weddingBriefPdf';
+import PriceSummary from './PriceSummary';
 import type { PdfFonts } from '../../hooks/usePdfAssets';
 
 type Props = {
@@ -28,12 +29,16 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
   const renderField = (field: WBField) => {
     const v = form[field.key];
 
+    if (field.type === 'summary') {
+      return <PriceSummary form={form} set={set} />;
+    }
+
     if (field.type === 'stations') {
       const stations = (v as WBStation[]) || [];
       const update = (i: number, patch: Partial<WBStation>) =>
         set(field.key, stations.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
       const remove = (i: number) => set(field.key, stations.filter((_, idx) => idx !== i));
-      const add = () => set(field.key, [...stations, { momento: '', strumentazione: '', note: '' }]);
+      const add = () => set(field.key, [...stations, { momento: '', strumentazione: '', note: '', prezzo: '', incluso: false }]);
       return (
         <div className="space-y-3">
           {stations.map((st, i) => (
