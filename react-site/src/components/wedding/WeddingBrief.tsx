@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { WB_SECTIONS, emptyWBForm, isWBFieldVisible, type WBField, type WBForm, type WBStation } from '../../data/weddingBrief';
 import { generateWeddingBriefPdf } from '../../lib/weddingBriefPdf';
 import type { PdfFonts } from '../../hooks/usePdfAssets';
@@ -12,14 +12,18 @@ const inputClass = 'mt-1 w-full px-3 py-2 rounded-lg bg-white/5 border border-wh
 
 export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
   const [form, setForm] = useState<WBForm>(() => emptyWBForm());
+  const [confirmReset, setConfirmReset] = useState(false);
   const set = (key: string, value: WBForm[string]) => setForm(f => ({ ...f, [key]: value }));
 
   const handlePdf = () =>
     generateWeddingBriefPdf(form, { fonts: fontDataRef.current, logo: logoDataRef.current });
 
-  const handleReset = () => {
-    if (confirm('Svuotare tutti i campi del brief?')) setForm(emptyWBForm());
-  };
+  useEffect(() => {
+    if (!confirmReset) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setConfirmReset(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [confirmReset]);
 
   const renderField = (field: WBField) => {
     const v = form[field.key];
@@ -179,12 +183,34 @@ export default function WeddingBrief({ fontDataRef, logoDataRef }: Props) {
       ))}
 
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end sticky bottom-0 bg-brand-navy-deep/90 backdrop-blur py-4 -mx-1 px-1 rounded-t-xl">
-        <button onClick={handleReset} className="btn-ghost justify-center text-sm">Svuota</button>
+        <button onClick={() => setConfirmReset(true)} className="btn-ghost justify-center text-sm">Svuota</button>
         <button onClick={handlePdf} className="btn-primary justify-center">
           <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current shrink-0"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>
           Genera PDF Brief
         </button>
       </div>
+
+      {/* RESET CONFIRM DIALOG */}
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setConfirmReset(false)}>
+          <div role="dialog" aria-modal="true" aria-label="Conferma svuota brief" className="card max-w-sm w-full p-6 bg-brand-navy text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-brand-pink/15 border border-brand-pink/40 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-brand-pink"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
+            </div>
+            <h3 className="font-display text-xl mb-1">Svuotare il brief?</h3>
+            <p className="text-sm text-white/60 mb-5">Tutti i campi compilati verranno azzerati. L'azione non è reversibile.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmReset(false)} className="btn-ghost flex-1 justify-center text-sm">Annulla</button>
+              <button
+                onClick={() => { setForm(emptyWBForm()); setConfirmReset(false); }}
+                className="btn-primary flex-1 justify-center text-sm"
+              >
+                Svuota tutto
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

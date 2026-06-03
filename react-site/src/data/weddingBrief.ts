@@ -118,13 +118,9 @@ export function isWBFieldVisible(field: WBField, form: WBForm): boolean {
   return form[field.showIf.key] === field.showIf.equals;
 }
 
-/** A helpful starting template of common wedding setup points. */
+/** Start with a single empty station; the user adds more as needed. */
 export function defaultStations(): WBStation[] {
-  return [
-    { momento: 'Aperitivo', strumentazione: '', note: '' },
-    { momento: 'Taglio torta', strumentazione: '', note: '' },
-    { momento: 'Festa / ballo principale', strumentazione: '', note: '' },
-  ];
+  return [{ momento: '', strumentazione: '', note: '' }];
 }
 
 /** Build an empty form with the right default per field type. */
