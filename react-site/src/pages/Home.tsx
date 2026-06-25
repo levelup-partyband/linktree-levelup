@@ -19,7 +19,7 @@ export default function Home() {
   const navigate = useNavigate();
   const logoClicks = useRef(0);
   const logoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prossimi = upcoming(eventi2026).slice(0, 4);
+  const prossimi = upcoming(eventi2026).slice(0, 6);
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
