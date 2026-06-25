@@ -19,7 +19,9 @@ export default function Home() {
   const navigate = useNavigate();
   const logoClicks = useRef(0);
   const logoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prossimi = upcoming(eventi2026).slice(0, 6);
+  const tuttiProssimi = upcoming(eventi2026);
+  const prossimi = tuttiProssimi.slice(0, 4);
+  const altreDate = tuttiProssimi.length - prossimi.length;
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
@@ -93,8 +95,11 @@ export default function Home() {
         <div className="grid sm:grid-cols-2 gap-4">
           {prossimi.map(e => <EventCard key={e.nome + e.data} e={e} />)}
         </div>
-        <div className="mt-6">
-          <Link to="/eventi" className="btn-ghost">Tutti gli eventi</Link>
+        <div className="mt-6 flex items-center gap-4">
+          <Link to="/eventi" className="btn-primary">
+            {altreDate > 0 ? `+${altreDate} altre date in programma` : 'Calendario completo'}
+          </Link>
+          <Link to="/eventi" className="text-sm text-white/50 hover:text-brand-pink transition-colors">Archivio eventi passati →</Link>
         </div>
       </section>
 
